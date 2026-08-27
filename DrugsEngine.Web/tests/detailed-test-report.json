@@ -1,0 +1,613 @@
+{
+  "total": 35,
+  "passed": 35,
+  "failed": 0,
+  "findings": [
+    {
+      "title": "Empty search query causes score saturation (0.99)",
+      "severity": "LOW",
+      "description": "In searchDrugsMock, d.name.toLowerCase().includes('') evaluates to true, overriding calculated scores to 0.99."
+    },
+    {
+      "title": "createReservationMock lacks 404 validation for unknown IDs",
+      "severity": "LOW",
+      "description": "Mock implementation falls back to array index 0 rather than returning null for 404 response."
+    }
+  ],
+  "testCases": [
+    {
+      "category": "Route: /search/drugs",
+      "name": "Standard query 'нурофен' returns matching catalog items",
+      "passed": true,
+      "details": {
+        "query": "нурофен",
+        "total": 1,
+        "firstMatch": "Нурофен Экспресс 200мг №24 капсулы"
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.540Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Empty search query ('') returns all catalog drugs with pagination",
+      "passed": true,
+      "details": {
+        "total": 9,
+        "catalogCount": 9
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.540Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Empty string match sets relevance score to 0.99 for all items due to string.includes('')",
+      "passed": true,
+      "details": {
+        "scores": [
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99
+        ]
+      },
+      "finding": {
+        "title": "Empty search query causes score saturation (0.99)",
+        "severity": "LOW",
+        "description": "In searchDrugsMock, d.name.toLowerCase().includes('') evaluates to true, overriding calculated scores to 0.99."
+      },
+      "timestamp": "2026-08-27T20:10:43.540Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Whitespace query ('   ') trims to empty and returns catalog drugs gracefully",
+      "passed": true,
+      "details": {
+        "query": "   ",
+        "total": 9
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.541Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Adversarial special character / XSS search query does not crash and returns 0 items safely",
+      "passed": true,
+      "details": {
+        "total": 0,
+        "items": []
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.541Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Extremely large query (5000 chars) executes within reasonable time without OOM",
+      "passed": true,
+      "details": {
+        "executionTimeMs": 28
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.541Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Invalid search mode fallback: validates mode to 'hybrid' and sets item.matchType to 'HYBRID'",
+      "passed": true,
+      "details": {
+        "requestedMode": "unsupported_mode",
+        "returnedMode": "hybrid",
+        "fallbackMatchType": "HYBRID"
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.541Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Sorting 'price_asc' strictly orders items by minPrice ascending",
+      "passed": true,
+      "details": {
+        "prices": [
+          65,
+          95,
+          180,
+          220,
+          240,
+          320,
+          340,
+          460,
+          490
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.542Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Sorting 'price_desc' strictly orders items by minPrice descending",
+      "passed": true,
+      "details": {
+        "prices": [
+          490,
+          460,
+          340,
+          320,
+          240,
+          220,
+          180,
+          95,
+          65
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.542Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Sorting 'name_asc' strictly orders items alphabetically with Russian locale",
+      "passed": true,
+      "details": {
+        "names": [
+          "Амоксиклав 875мг+125мг №14 таблетки",
+          "Аторвастатин 20мг №30 таблетки",
+          "Дексалгин 25мг №10 гранулы",
+          "Ибупрофен-АКОС 400мг №20 таблетки",
+          "Метформин 1000мг №60 таблетки",
+          "МИГ 400 400мг №20 таблетки",
+          "Нурофен Экспресс 200мг №24 капсулы",
+          "Омез 20мг №30 капсулы",
+          "Парацетамол Экстра 500мг №20 таблетки"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.557Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Filter 'inStockOnly=true' returns exclusively in-stock items",
+      "passed": true,
+      "details": {
+        "count": 9
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.557Z"
+    },
+    {
+      "category": "Route: /search/drugs",
+      "name": "Pagination out of range (page=50) returns empty items array with valid total and totalPages",
+      "passed": true,
+      "details": {
+        "page": 50,
+        "total": 9,
+        "totalPages": 1
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.557Z"
+    },
+    {
+      "category": "Route: /drugs/[id]",
+      "name": "Existing drug ID returns complete DrugDetailsDto matching all 20 contract fields",
+      "passed": true,
+      "details": {
+        "id": "e4b9d7a2-1a2c-49e3-85f0-61b6c7a10001",
+        "fieldsPresent": 20
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.558Z"
+    },
+    {
+      "category": "Route: /drugs/[id]",
+      "name": "Non-existent drug ID returns null (triggers 404 RFC 7807 handler)",
+      "passed": true,
+      "details": {
+        "requestedId": "non-existent-guid-999"
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.558Z"
+    },
+    {
+      "category": "Route: /drugs/[id]/analogs",
+      "name": "Finds analogs with threshold 0.7 and orders them descending by cosine score",
+      "passed": true,
+      "details": {
+        "source": "Нурофен Экспресс 200мг №24 капсулы",
+        "count": 4
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.559Z"
+    },
+    {
+      "category": "Route: /drugs/[id]/analogs",
+      "name": "High similarity threshold (>99%) returns empty analogs array with 200 OK without crashing",
+      "passed": true,
+      "details": {
+        "thresholdApplied": 0.99,
+        "found": 0
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.559Z"
+    },
+    {
+      "category": "Route: /drugs/[id]/analogs",
+      "name": "Non-existent drug ID returns null (triggers 404 RFC 7807 handler)",
+      "passed": true,
+      "details": {
+        "requestedId": "unknown-id-0000"
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.559Z"
+    },
+    {
+      "category": "Route: /pharmacies",
+      "name": "Returns list of pharmacies with attached drug inventory and pricing",
+      "passed": true,
+      "details": {
+        "total": 6
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /pharmacies",
+      "name": "Zero radius (radiusKm=0) is correctly preserved when explicitly passed (radiusKm: 0)",
+      "passed": true,
+      "details": {
+        "requestedRadius": 0,
+        "returnedRadius": 0
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /pharmacies",
+      "name": "Non-existent drugId handled gracefully without error (pharmacies returned without inventory)",
+      "passed": true,
+      "details": {
+        "total": 6
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /pharmacies/[id]/reserve",
+      "name": "Valid reservation creates CONFIRMED hold, DG-XXXX pickup code, exact unit & total prices, 24h expiration",
+      "passed": true,
+      "details": {
+        "pickupCode": "DG-9859",
+        "totalPrice": 960,
+        "expiresAt": "2026-08-28T20:10:43.560Z"
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /pharmacies/[id]/reserve",
+      "name": "Unknown pharmacyId or drugId silently falls back to MOCK_PHARMACIES[0] / MOCK_DRUGS[0] in mock handler",
+      "passed": true,
+      "details": {
+        "usedPharmacy": "Аптека «Ригла» №142",
+        "usedDrug": "Нурофен Экспресс 200мг №24 капсулы"
+      },
+      "finding": {
+        "title": "createReservationMock lacks 404 validation for unknown IDs",
+        "severity": "LOW",
+        "description": "Mock implementation falls back to array index 0 rather than returning null for 404 response."
+      },
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /telemetry/health",
+      "name": "Returns SystemHealthResponse with status 'Healthy' and all 5 backend microservices UP",
+      "passed": true,
+      "details": {
+        "status": "Healthy",
+        "services": [
+          "dotnetApi",
+          "postgresql",
+          "kafka",
+          "qdrant",
+          "pythonEmbeddingService"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /telemetry/metrics",
+      "name": "Returns SystemMetricsResponse with complete HTTP, Kafka, Qdrant, DB, and Runtime telemetry",
+      "passed": true,
+      "details": {
+        "rps": 142.5,
+        "vectors": 128450,
+        "cpu": 8.5
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.560Z"
+    },
+    {
+      "category": "Route: /telemetry/metrics/history",
+      "name": "Returns timeseries history points array for requested metric and time range",
+      "passed": true,
+      "details": {
+        "pointsCount": 31,
+        "step": "1m"
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.561Z"
+    },
+    {
+      "category": "Route: /search/suggestions",
+      "name": "Prefix 'нур' suggests matching brand drug (Нурофен)",
+      "passed": true,
+      "details": {
+        "suggestions": [
+          "Нурофен Экспресс 200мг №24 капсулы"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.561Z"
+    },
+    {
+      "category": "Route: /search/suggestions",
+      "name": "Prefix 'ибу' suggests active ingredient (Ибупрофен)",
+      "passed": true,
+      "details": {
+        "suggestions": [
+          "ACTIVE_INGREDIENT: Ибупрофен (Ibuprofen)",
+          "ACTIVE_INGREDIENT: Ибупрофен (Ibuprofen)",
+          "DRUG: Ибупрофен-АКОС 400мг №20 таблетки"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.561Z"
+    },
+    {
+      "category": "Route: /search/suggestions",
+      "name": "Symptom query 'головная боль' provides Qdrant semantic vector search suggestion",
+      "passed": true,
+      "details": {
+        "suggestions": [
+          "SYMPTOM_QUERY: Семантический поиск: «головная боль»"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.561Z"
+    },
+    {
+      "category": "Route: /search/suggestions",
+      "name": "Query with length < 2 returns empty suggestions list",
+      "passed": true,
+      "details": {
+        "query": "a",
+        "count": 0
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.562Z"
+    },
+    {
+      "category": "Calculations",
+      "name": "Similarity % calculation: similarityPercentage === (cosineScore * 100) rounded to 1 decimal",
+      "passed": true,
+      "details": {
+        "sample": [
+          {
+            "cosine": 0.985,
+            "pct": 98.5
+          },
+          {
+            "cosine": 0.962,
+            "pct": 96.2
+          },
+          {
+            "cosine": 0.915,
+            "pct": 91.5
+          },
+          {
+            "cosine": 0.765,
+            "pct": 76.5
+          },
+          {
+            "cosine": 0.68,
+            "pct": 68
+          },
+          {
+            "cosine": 0.68,
+            "pct": 68
+          },
+          {
+            "cosine": 0.68,
+            "pct": 68
+          },
+          {
+            "cosine": 0.68,
+            "pct": 68
+          }
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.562Z"
+    },
+    {
+      "category": "Calculations",
+      "name": "Price savings delta calculation: amountDifference, percentageDifference, isCheaper, and formattedLabel are mathematically exact",
+      "passed": true,
+      "details": {
+        "items": [
+          {
+            "name": "МИГ 400 400мг №20 таблетки",
+            "src": 320,
+            "cand": 240,
+            "diff": -80,
+            "pct": -25,
+            "isCheaper": true,
+            "label": "На 25% дешевле (экономия 80 ₽)"
+          },
+          {
+            "name": "Ибупрофен-АКОС 400мг №20 таблетки",
+            "src": 320,
+            "cand": 95,
+            "diff": -225,
+            "pct": -70.3,
+            "isCheaper": true,
+            "label": "На 70.3% дешевле (экономия 225 ₽)"
+          },
+          {
+            "name": "Дексалгин 25мг №10 гранулы",
+            "src": 320,
+            "cand": 490,
+            "diff": 170,
+            "pct": 53.1,
+            "isCheaper": false,
+            "label": "На 53.1% дороже (+170 ₽)"
+          },
+          {
+            "name": "Парацетамол Экстра 500мг №20 таблетки",
+            "src": 320,
+            "cand": 65,
+            "diff": -255,
+            "pct": -79.7,
+            "isCheaper": true,
+            "label": "На 79.7% дешевле (экономия 255 ₽)"
+          },
+          {
+            "name": "Амоксиклав 875мг+125мг №14 таблетки",
+            "src": 320,
+            "cand": 460,
+            "diff": 140,
+            "pct": 43.8,
+            "isCheaper": false,
+            "label": "На 43.8% дороже (+140 ₽)"
+          },
+          {
+            "name": "Омез 20мг №30 капсулы",
+            "src": 320,
+            "cand": 180,
+            "diff": -140,
+            "pct": -43.8,
+            "isCheaper": true,
+            "label": "На 43.8% дешевле (экономия 140 ₽)"
+          },
+          {
+            "name": "Аторвастатин 20мг №30 таблетки",
+            "src": 320,
+            "cand": 340,
+            "diff": 20,
+            "pct": 6.3,
+            "isCheaper": false,
+            "label": "На 6.3% дороже (+20 ₽)"
+          },
+          {
+            "name": "Метформин 1000мг №60 таблетки",
+            "src": 320,
+            "cand": 220,
+            "diff": -100,
+            "pct": -31.3,
+            "isCheaper": true,
+            "label": "На 31.3% дешевле (экономия 100 ₽)"
+          }
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.562Z"
+    },
+    {
+      "category": "Calculations",
+      "name": "Price savings delta handles hypothetical zero source price without throwing",
+      "passed": true,
+      "details": {
+        "result": {
+          "priceDiff": 100,
+          "pctDiff": 0,
+          "isCheaper": false,
+          "formattedLabel": "На 0% дороже (+100 ₽)"
+        }
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.562Z"
+    },
+    {
+      "category": "Calculations",
+      "name": "Stock status assignment: IN_STOCK (qty >= 5), LOW_STOCK (0 < qty < 5), OUT_OF_STOCK (qty == 0) consistent across all pharmacies",
+      "passed": true,
+      "details": {
+        "uniqueLevels": [
+          "IN_STOCK",
+          "LOW_STOCK",
+          "OUT_OF_STOCK"
+        ],
+        "pharmacies": [
+          {
+            "name": "Аптека «Ригла» №142",
+            "level": "IN_STOCK",
+            "qty": 12
+          },
+          {
+            "name": "Аптека «Апрель» №88",
+            "level": "LOW_STOCK",
+            "qty": 2
+          },
+          {
+            "name": "Аптека «Планета Здоровья» №5",
+            "level": "IN_STOCK",
+            "qty": 20
+          },
+          {
+            "name": "Аптека «36.6» №204",
+            "level": "OUT_OF_STOCK",
+            "qty": 0
+          },
+          {
+            "name": "Аптека «Столички» №17",
+            "level": "IN_STOCK",
+            "qty": 28
+          },
+          {
+            "name": "Аптека «Доктор Столетов» №41",
+            "level": "IN_STOCK",
+            "qty": 32
+          }
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.563Z"
+    },
+    {
+      "category": "RFC 7807 Compliance",
+      "name": "API route handlers implement RFC 7807 base fields (type, title, status, detail, instance, timestamp)",
+      "passed": true,
+      "details": {
+        "verifiedFiles": [
+          "app/api/v1/drugs/[id]/route.ts",
+          "app/api/v1/drugs/[id]/analogs/route.ts",
+          "app/api/v1/pharmacies/[pharmacyId]/route.ts",
+          "app/api/v1/pharmacies/[pharmacyId]/reserve/route.ts"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.564Z"
+    },
+    {
+      "category": "Contract Fidelity",
+      "name": "All 4 error-returning API route handlers strictly include 'code' and 'traceId' conforming to OpenAPI 3.1 & contracts.ts",
+      "passed": true,
+      "details": {
+        "missingIn": [],
+        "openapiRequired": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "code",
+          "timestamp",
+          "traceId"
+        ]
+      },
+      "finding": null,
+      "timestamp": "2026-08-27T20:10:43.564Z"
+    }
+  ]
+}

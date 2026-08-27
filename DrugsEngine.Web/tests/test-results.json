@@ -1,0 +1,431 @@
+{
+  "total": 25,
+  "passed": 25,
+  "failed": 0,
+  "results": [
+    {
+      "test": "Search Route: Exact query 'нурофен' returns matching drugs",
+      "passed": true,
+      "details": {
+        "total": 1,
+        "firstMatch": "Нурофен Экспресс 200мг №24 капсулы"
+      },
+      "timestamp": "2026-08-27T20:07:24.560Z"
+    },
+    {
+      "test": "Search Route (Edge Case): Empty query returns all catalog items",
+      "passed": true,
+      "details": {
+        "total": 9,
+        "expected": 9
+      },
+      "timestamp": "2026-08-27T20:07:24.560Z"
+    },
+    {
+      "test": "Search Route (Finding): Empty query causes string.includes('') -> all scores set to 0.99",
+      "passed": true,
+      "details": {
+        "scores": [
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99,
+          0.99
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.561Z"
+    },
+    {
+      "test": "Search Route (Edge Case): Non-existent query returns empty items list with totalPages=1",
+      "passed": true,
+      "details": {
+        "total": 0,
+        "itemsLength": 0
+      },
+      "timestamp": "2026-08-27T20:07:24.561Z"
+    },
+    {
+      "test": "Search Route (Edge Case): Invalid mode gracefully falls back matchType to HYBRID",
+      "passed": true,
+      "details": {
+        "requestedMode": "ultra_hyper_mode",
+        "returnedMode": "ultra_hyper_mode",
+        "itemMatchType": "HYBRID"
+      },
+      "timestamp": "2026-08-27T20:07:24.561Z"
+    },
+    {
+      "test": "Search Route (Edge Case): Out-of-bounds page (page=99) returns empty array without throwing",
+      "passed": true,
+      "details": {
+        "page": 99,
+        "itemsCount": 0,
+        "total": 9
+      },
+      "timestamp": "2026-08-27T20:07:24.562Z"
+    },
+    {
+      "test": "Search Route: Sorting by price_asc produces strictly non-decreasing prices",
+      "passed": true,
+      "details": {
+        "prices": [
+          65,
+          95,
+          180,
+          220,
+          240,
+          320,
+          340,
+          460,
+          490
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.562Z"
+    },
+    {
+      "test": "Search Route: Sorting by price_desc produces strictly non-increasing prices",
+      "passed": true,
+      "details": {
+        "prices": [
+          490,
+          460,
+          340,
+          320,
+          240,
+          220,
+          180,
+          95,
+          65
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.562Z"
+    },
+    {
+      "test": "Drug Details Route: Returns complete DrugDetailsDto with Qdrant vector status for existing ID",
+      "passed": true,
+      "details": {
+        "id": "e4b9d7a2-1a2c-49e3-85f0-61b6c7a10001",
+        "name": "Нурофен Экспресс 200мг №24 капсулы",
+        "qdrantIndexed": true
+      },
+      "timestamp": "2026-08-27T20:07:24.562Z"
+    },
+    {
+      "test": "Drug Details Route (Edge Case): Non-existent ID returns null (triggers 404 RFC 7807 handler)",
+      "passed": true,
+      "details": {
+        "result": null
+      },
+      "timestamp": "2026-08-27T20:07:24.562Z"
+    },
+    {
+      "test": "Drug Analogs Route: Returns analogs list ordered by cosine similarity descending",
+      "passed": true,
+      "details": {
+        "totalFound": 4,
+        "topAnalog": "МИГ 400 400мг №20 таблетки",
+        "topCosine": 0.985
+      },
+      "timestamp": "2026-08-27T20:07:24.563Z"
+    },
+    {
+      "test": "Drug Analogs Route (Edge Case): Extreme threshold (threshold=0.99) returns empty array with 200 OK",
+      "passed": true,
+      "details": {
+        "thresholdApplied": 0.99,
+        "analogsCount": 0
+      },
+      "timestamp": "2026-08-27T20:07:24.563Z"
+    },
+    {
+      "test": "Drug Analogs Route (Edge Case): Non-existent drug ID returns null (triggers 404 RFC 7807 handler)",
+      "passed": true,
+      "details": {
+        "result": null
+      },
+      "timestamp": "2026-08-27T20:07:24.563Z"
+    },
+    {
+      "test": "Pharmacies Route: Returns all pharmacies with inventory data populated when drugId is provided",
+      "passed": true,
+      "details": {
+        "totalFound": 6,
+        "firstPharmacyInventory": "IN_STOCK"
+      },
+      "timestamp": "2026-08-27T20:07:24.563Z"
+    },
+    {
+      "test": "Pharmacies Route (Finding/Edge Case): radiusKm=0 evaluates as falsy and defaults to 10.0 km",
+      "passed": true,
+      "details": {
+        "requestedRadius": 0,
+        "returnedRadius": 10
+      },
+      "timestamp": "2026-08-27T20:07:24.563Z"
+    },
+    {
+      "test": "Pharmacies Route (Edge Case): Non-existent drugId returns pharmacies with undefined inventory gracefully",
+      "passed": true,
+      "details": {
+        "count": 6,
+        "inventoryDefined": false
+      },
+      "timestamp": "2026-08-27T20:07:24.564Z"
+    },
+    {
+      "test": "Reservation Route: Valid payload creates CONFIRMED reservation with valid pickupCode and expiration in 24h",
+      "passed": true,
+      "details": {
+        "pickupCode": "DG-7387",
+        "totalPrice": 640,
+        "expiresAt": "2026-08-28T20:07:24.564Z"
+      },
+      "timestamp": "2026-08-27T20:07:24.564Z"
+    },
+    {
+      "test": "Reservation Route (Finding): Unknown pharmacyId/drugId silently falls back to default mock items",
+      "passed": true,
+      "details": {
+        "usedPharmacy": "Аптека «Ригла» №142",
+        "usedDrug": "Нурофен Экспресс 200мг №24 капсулы"
+      },
+      "timestamp": "2026-08-27T20:07:24.564Z"
+    },
+    {
+      "test": "Telemetry Health Route: Returns status 'Healthy' and all 5 backend microservices UP",
+      "passed": true,
+      "details": {
+        "status": "Healthy",
+        "services": [
+          "dotnetApi",
+          "postgresql",
+          "kafka",
+          "qdrant",
+          "pythonEmbeddingService"
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.564Z"
+    },
+    {
+      "test": "Telemetry Metrics Route: Returns full system metrics (HTTP, Kafka, Qdrant, DB, Runtime)",
+      "passed": true,
+      "details": {
+        "rps": 142.5,
+        "kafkaLag": 0,
+        "vectors": 128450
+      },
+      "timestamp": "2026-08-27T20:07:24.564Z"
+    },
+    {
+      "test": "Calculation: similarityPercentage strictly equals (cosineScore * 100) rounded to 1 decimal",
+      "passed": true,
+      "details": {
+        "count": 8,
+        "details": [
+          {
+            "name": "МИГ 400 400мг №20 таблетки",
+            "cosine": 0.985,
+            "actualPct": 98.5,
+            "expectedPct": 98.5
+          },
+          {
+            "name": "Ибупрофен-АКОС 400мг №20 таблетки",
+            "cosine": 0.962,
+            "actualPct": 96.2,
+            "expectedPct": 96.2
+          },
+          {
+            "name": "Дексалгин 25мг №10 гранулы",
+            "cosine": 0.915,
+            "actualPct": 91.5,
+            "expectedPct": 91.5
+          },
+          {
+            "name": "Парацетамол Экстра 500мг №20 таблетки",
+            "cosine": 0.765,
+            "actualPct": 76.5,
+            "expectedPct": 76.5
+          },
+          {
+            "name": "Амоксиклав 875мг+125мг №14 таблетки",
+            "cosine": 0.68,
+            "actualPct": 68,
+            "expectedPct": 68
+          },
+          {
+            "name": "Омез 20мг №30 капсулы",
+            "cosine": 0.68,
+            "actualPct": 68,
+            "expectedPct": 68
+          },
+          {
+            "name": "Аторвастатин 20мг №30 таблетки",
+            "cosine": 0.68,
+            "actualPct": 68,
+            "expectedPct": 68
+          },
+          {
+            "name": "Метформин 1000мг №60 таблетки",
+            "cosine": 0.68,
+            "actualPct": 68,
+            "expectedPct": 68
+          }
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.565Z"
+    },
+    {
+      "test": "Calculation: Price delta (amountDifference, percentageDifference, isCheaper) is mathematically exact",
+      "passed": true,
+      "details": {
+        "sourcePrice": 320,
+        "items": [
+          {
+            "name": "МИГ 400 400мг №20 таблетки",
+            "sourcePrice": 320,
+            "candPrice": 240,
+            "amountDiff": -80,
+            "pctDiff": -25,
+            "isCheaper": true,
+            "label": "На 25% дешевле (экономия 80 ₽)"
+          },
+          {
+            "name": "Ибупрофен-АКОС 400мг №20 таблетки",
+            "sourcePrice": 320,
+            "candPrice": 95,
+            "amountDiff": -225,
+            "pctDiff": -70.3,
+            "isCheaper": true,
+            "label": "На 70.3% дешевле (экономия 225 ₽)"
+          },
+          {
+            "name": "Дексалгин 25мг №10 гранулы",
+            "sourcePrice": 320,
+            "candPrice": 490,
+            "amountDiff": 170,
+            "pctDiff": 53.1,
+            "isCheaper": false,
+            "label": "На 53.1% дороже (+170 ₽)"
+          },
+          {
+            "name": "Парацетамол Экстра 500мг №20 таблетки",
+            "sourcePrice": 320,
+            "candPrice": 65,
+            "amountDiff": -255,
+            "pctDiff": -79.7,
+            "isCheaper": true,
+            "label": "На 79.7% дешевле (экономия 255 ₽)"
+          },
+          {
+            "name": "Амоксиклав 875мг+125мг №14 таблетки",
+            "sourcePrice": 320,
+            "candPrice": 460,
+            "amountDiff": 140,
+            "pctDiff": 43.8,
+            "isCheaper": false,
+            "label": "На 43.8% дороже (+140 ₽)"
+          },
+          {
+            "name": "Омез 20мг №30 капсулы",
+            "sourcePrice": 320,
+            "candPrice": 180,
+            "amountDiff": -140,
+            "pctDiff": -43.8,
+            "isCheaper": true,
+            "label": "На 43.8% дешевле (экономия 140 ₽)"
+          },
+          {
+            "name": "Аторвастатин 20мг №30 таблетки",
+            "sourcePrice": 320,
+            "candPrice": 340,
+            "amountDiff": 20,
+            "pctDiff": 6.3,
+            "isCheaper": false,
+            "label": "На 6.3% дороже (+20 ₽)"
+          },
+          {
+            "name": "Метформин 1000мг №60 таблетки",
+            "sourcePrice": 320,
+            "candPrice": 220,
+            "amountDiff": -100,
+            "pctDiff": -31.3,
+            "isCheaper": true,
+            "label": "На 31.3% дешевле (экономия 100 ₽)"
+          }
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.565Z"
+    },
+    {
+      "test": "Calculation: Stock status (IN_STOCK, LOW_STOCK, OUT_OF_STOCK) correlates consistently with inventory quantity",
+      "passed": true,
+      "details": {
+        "stockLevelsFound": [
+          "IN_STOCK",
+          "LOW_STOCK",
+          "OUT_OF_STOCK"
+        ],
+        "sample": [
+          {
+            "pharmacy": "Аптека «Ригла» №142",
+            "stock": "IN_STOCK",
+            "qty": 12
+          },
+          {
+            "pharmacy": "Аптека «Апрель» №88",
+            "stock": "LOW_STOCK",
+            "qty": 2
+          },
+          {
+            "pharmacy": "Аптека «Планета Здоровья» №5",
+            "stock": "IN_STOCK",
+            "qty": 20
+          },
+          {
+            "pharmacy": "Аптека «36.6» №204",
+            "stock": "OUT_OF_STOCK",
+            "qty": 0
+          },
+          {
+            "pharmacy": "Аптека «Столички» №17",
+            "stock": "IN_STOCK",
+            "qty": 28
+          },
+          {
+            "pharmacy": "Аптека «Доктор Столетов» №41",
+            "stock": "IN_STOCK",
+            "qty": 32
+          }
+        ]
+      },
+      "timestamp": "2026-08-27T20:07:24.565Z"
+    },
+    {
+      "test": "RFC 7807 Problem Details: Error responses conform to standard RFC 7807 fields",
+      "passed": true,
+      "details": {
+        "sample": {
+          "type": "https://drugsengine.internal/errors/not-found",
+          "title": "Drug Not Found",
+          "status": 404,
+          "detail": "Drug with identifier '0000' was not found in catalog.",
+          "instance": "/api/v1/drugs/0000",
+          "timestamp": "2026-08-27T20:07:24.565Z"
+        }
+      },
+      "timestamp": "2026-08-27T20:07:24.565Z"
+    },
+    {
+      "test": "RFC 7807 (Contract Discrepancy Finding): Route handlers omit 'code' and 'traceId' fields required by ApiErrorResponse in contracts.ts",
+      "passed": true,
+      "details": {
+        "note": "contracts.ts defines code: string and traceId: string as mandatory, while API routes omit them."
+      },
+      "timestamp": "2026-08-27T20:07:24.565Z"
+    }
+  ]
+}
