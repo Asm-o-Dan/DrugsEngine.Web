@@ -1,7 +1,7 @@
 {
   "total": 25,
-  "passed": 25,
-  "failed": 0,
+  "passed": 24,
+  "failed": 1,
   "results": [
     {
       "test": "Search Route: Exact query 'нурофен' returns matching drugs",
@@ -10,7 +10,7 @@
         "total": 1,
         "firstMatch": "Нурофен Экспресс 200мг №24 капсулы"
       },
-      "timestamp": "2026-08-27T20:07:24.560Z"
+      "timestamp": "2026-08-27T20:16:23.698Z"
     },
     {
       "test": "Search Route (Edge Case): Empty query returns all catalog items",
@@ -19,7 +19,7 @@
         "total": 9,
         "expected": 9
       },
-      "timestamp": "2026-08-27T20:07:24.560Z"
+      "timestamp": "2026-08-27T20:16:23.699Z"
     },
     {
       "test": "Search Route (Finding): Empty query causes string.includes('') -> all scores set to 0.99",
@@ -37,7 +37,7 @@
           0.99
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.561Z"
+      "timestamp": "2026-08-27T20:16:23.699Z"
     },
     {
       "test": "Search Route (Edge Case): Non-existent query returns empty items list with totalPages=1",
@@ -46,17 +46,17 @@
         "total": 0,
         "itemsLength": 0
       },
-      "timestamp": "2026-08-27T20:07:24.561Z"
+      "timestamp": "2026-08-27T20:16:23.699Z"
     },
     {
       "test": "Search Route (Edge Case): Invalid mode gracefully falls back matchType to HYBRID",
       "passed": true,
       "details": {
         "requestedMode": "ultra_hyper_mode",
-        "returnedMode": "ultra_hyper_mode",
+        "returnedMode": "hybrid",
         "itemMatchType": "HYBRID"
       },
-      "timestamp": "2026-08-27T20:07:24.561Z"
+      "timestamp": "2026-08-27T20:16:23.699Z"
     },
     {
       "test": "Search Route (Edge Case): Out-of-bounds page (page=99) returns empty array without throwing",
@@ -66,7 +66,7 @@
         "itemsCount": 0,
         "total": 9
       },
-      "timestamp": "2026-08-27T20:07:24.562Z"
+      "timestamp": "2026-08-27T20:16:23.699Z"
     },
     {
       "test": "Search Route: Sorting by price_asc produces strictly non-decreasing prices",
@@ -84,7 +84,7 @@
           490
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.562Z"
+      "timestamp": "2026-08-27T20:16:23.699Z"
     },
     {
       "test": "Search Route: Sorting by price_desc produces strictly non-increasing prices",
@@ -102,7 +102,7 @@
           65
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.562Z"
+      "timestamp": "2026-08-27T20:16:23.700Z"
     },
     {
       "test": "Drug Details Route: Returns complete DrugDetailsDto with Qdrant vector status for existing ID",
@@ -112,7 +112,7 @@
         "name": "Нурофен Экспресс 200мг №24 капсулы",
         "qdrantIndexed": true
       },
-      "timestamp": "2026-08-27T20:07:24.562Z"
+      "timestamp": "2026-08-27T20:16:23.700Z"
     },
     {
       "test": "Drug Details Route (Edge Case): Non-existent ID returns null (triggers 404 RFC 7807 handler)",
@@ -120,7 +120,7 @@
       "details": {
         "result": null
       },
-      "timestamp": "2026-08-27T20:07:24.562Z"
+      "timestamp": "2026-08-27T20:16:23.700Z"
     },
     {
       "test": "Drug Analogs Route: Returns analogs list ordered by cosine similarity descending",
@@ -130,7 +130,7 @@
         "topAnalog": "МИГ 400 400мг №20 таблетки",
         "topCosine": 0.985
       },
-      "timestamp": "2026-08-27T20:07:24.563Z"
+      "timestamp": "2026-08-27T20:16:23.700Z"
     },
     {
       "test": "Drug Analogs Route (Edge Case): Extreme threshold (threshold=0.99) returns empty array with 200 OK",
@@ -139,7 +139,7 @@
         "thresholdApplied": 0.99,
         "analogsCount": 0
       },
-      "timestamp": "2026-08-27T20:07:24.563Z"
+      "timestamp": "2026-08-27T20:16:23.701Z"
     },
     {
       "test": "Drug Analogs Route (Edge Case): Non-existent drug ID returns null (triggers 404 RFC 7807 handler)",
@@ -147,7 +147,7 @@
       "details": {
         "result": null
       },
-      "timestamp": "2026-08-27T20:07:24.563Z"
+      "timestamp": "2026-08-27T20:16:23.701Z"
     },
     {
       "test": "Pharmacies Route: Returns all pharmacies with inventory data populated when drugId is provided",
@@ -156,16 +156,16 @@
         "totalFound": 6,
         "firstPharmacyInventory": "IN_STOCK"
       },
-      "timestamp": "2026-08-27T20:07:24.563Z"
+      "timestamp": "2026-08-27T20:16:23.701Z"
     },
     {
       "test": "Pharmacies Route (Finding/Edge Case): radiusKm=0 evaluates as falsy and defaults to 10.0 km",
-      "passed": true,
+      "passed": false,
       "details": {
         "requestedRadius": 0,
-        "returnedRadius": 10
+        "returnedRadius": 0
       },
-      "timestamp": "2026-08-27T20:07:24.563Z"
+      "timestamp": "2026-08-27T20:16:23.701Z"
     },
     {
       "test": "Pharmacies Route (Edge Case): Non-existent drugId returns pharmacies with undefined inventory gracefully",
@@ -174,17 +174,17 @@
         "count": 6,
         "inventoryDefined": false
       },
-      "timestamp": "2026-08-27T20:07:24.564Z"
+      "timestamp": "2026-08-27T20:16:23.702Z"
     },
     {
       "test": "Reservation Route: Valid payload creates CONFIRMED reservation with valid pickupCode and expiration in 24h",
       "passed": true,
       "details": {
-        "pickupCode": "DG-7387",
+        "pickupCode": "DG-2620",
         "totalPrice": 640,
-        "expiresAt": "2026-08-28T20:07:24.564Z"
+        "expiresAt": "2026-08-28T20:16:23.702Z"
       },
-      "timestamp": "2026-08-27T20:07:24.564Z"
+      "timestamp": "2026-08-27T20:16:23.702Z"
     },
     {
       "test": "Reservation Route (Finding): Unknown pharmacyId/drugId silently falls back to default mock items",
@@ -193,7 +193,7 @@
         "usedPharmacy": "Аптека «Ригла» №142",
         "usedDrug": "Нурофен Экспресс 200мг №24 капсулы"
       },
-      "timestamp": "2026-08-27T20:07:24.564Z"
+      "timestamp": "2026-08-27T20:16:23.702Z"
     },
     {
       "test": "Telemetry Health Route: Returns status 'Healthy' and all 5 backend microservices UP",
@@ -208,7 +208,7 @@
           "pythonEmbeddingService"
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.564Z"
+      "timestamp": "2026-08-27T20:16:23.702Z"
     },
     {
       "test": "Telemetry Metrics Route: Returns full system metrics (HTTP, Kafka, Qdrant, DB, Runtime)",
@@ -218,7 +218,7 @@
         "kafkaLag": 0,
         "vectors": 128450
       },
-      "timestamp": "2026-08-27T20:07:24.564Z"
+      "timestamp": "2026-08-27T20:16:23.702Z"
     },
     {
       "test": "Calculation: similarityPercentage strictly equals (cosineScore * 100) rounded to 1 decimal",
@@ -276,7 +276,7 @@
           }
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.565Z"
+      "timestamp": "2026-08-27T20:16:23.702Z"
     },
     {
       "test": "Calculation: Price delta (amountDifference, percentageDifference, isCheaper) is mathematically exact",
@@ -358,7 +358,7 @@
           }
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.565Z"
+      "timestamp": "2026-08-27T20:16:23.703Z"
     },
     {
       "test": "Calculation: Stock status (IN_STOCK, LOW_STOCK, OUT_OF_STOCK) correlates consistently with inventory quantity",
@@ -402,7 +402,7 @@
           }
         ]
       },
-      "timestamp": "2026-08-27T20:07:24.565Z"
+      "timestamp": "2026-08-27T20:16:23.703Z"
     },
     {
       "test": "RFC 7807 Problem Details: Error responses conform to standard RFC 7807 fields",
@@ -414,10 +414,10 @@
           "status": 404,
           "detail": "Drug with identifier '0000' was not found in catalog.",
           "instance": "/api/v1/drugs/0000",
-          "timestamp": "2026-08-27T20:07:24.565Z"
+          "timestamp": "2026-08-27T20:16:23.703Z"
         }
       },
-      "timestamp": "2026-08-27T20:07:24.565Z"
+      "timestamp": "2026-08-27T20:16:23.703Z"
     },
     {
       "test": "RFC 7807 (Contract Discrepancy Finding): Route handlers omit 'code' and 'traceId' fields required by ApiErrorResponse in contracts.ts",
@@ -425,7 +425,7 @@
       "details": {
         "note": "contracts.ts defines code: string and traceId: string as mandatory, while API routes omit them."
       },
-      "timestamp": "2026-08-27T20:07:24.565Z"
+      "timestamp": "2026-08-27T20:16:23.703Z"
     }
   ]
 }

@@ -25,7 +25,7 @@
         "firstMatch": "Нурофен Экспресс 200мг №24 капсулы"
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.540Z"
+      "timestamp": "2026-08-27T20:16:26.897Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -36,7 +36,7 @@
         "catalogCount": 9
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.540Z"
+      "timestamp": "2026-08-27T20:16:26.898Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -60,7 +60,7 @@
         "severity": "LOW",
         "description": "In searchDrugsMock, d.name.toLowerCase().includes('') evaluates to true, overriding calculated scores to 0.99."
       },
-      "timestamp": "2026-08-27T20:10:43.540Z"
+      "timestamp": "2026-08-27T20:16:26.898Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -71,7 +71,7 @@
         "total": 9
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.541Z"
+      "timestamp": "2026-08-27T20:16:26.898Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -82,17 +82,17 @@
         "items": []
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.541Z"
+      "timestamp": "2026-08-27T20:16:26.898Z"
     },
     {
       "category": "Route: /search/drugs",
       "name": "Extremely large query (5000 chars) executes within reasonable time without OOM",
       "passed": true,
       "details": {
-        "executionTimeMs": 28
+        "executionTimeMs": 40
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.541Z"
+      "timestamp": "2026-08-27T20:16:26.898Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -104,7 +104,7 @@
         "fallbackMatchType": "HYBRID"
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.541Z"
+      "timestamp": "2026-08-27T20:16:26.899Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -124,7 +124,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.542Z"
+      "timestamp": "2026-08-27T20:16:26.899Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -144,7 +144,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.542Z"
+      "timestamp": "2026-08-27T20:16:26.899Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -164,7 +164,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.557Z"
+      "timestamp": "2026-08-27T20:16:26.911Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -174,7 +174,7 @@
         "count": 9
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.557Z"
+      "timestamp": "2026-08-27T20:16:26.911Z"
     },
     {
       "category": "Route: /search/drugs",
@@ -186,7 +186,7 @@
         "totalPages": 1
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.557Z"
+      "timestamp": "2026-08-27T20:16:26.911Z"
     },
     {
       "category": "Route: /drugs/[id]",
@@ -197,7 +197,7 @@
         "fieldsPresent": 20
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.558Z"
+      "timestamp": "2026-08-27T20:16:26.911Z"
     },
     {
       "category": "Route: /drugs/[id]",
@@ -207,7 +207,7 @@
         "requestedId": "non-existent-guid-999"
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.558Z"
+      "timestamp": "2026-08-27T20:16:26.911Z"
     },
     {
       "category": "Route: /drugs/[id]/analogs",
@@ -218,7 +218,7 @@
         "count": 4
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.559Z"
+      "timestamp": "2026-08-27T20:16:26.912Z"
     },
     {
       "category": "Route: /drugs/[id]/analogs",
@@ -229,7 +229,7 @@
         "found": 0
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.559Z"
+      "timestamp": "2026-08-27T20:16:26.912Z"
     },
     {
       "category": "Route: /drugs/[id]/analogs",
@@ -239,7 +239,7 @@
         "requestedId": "unknown-id-0000"
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.559Z"
+      "timestamp": "2026-08-27T20:16:26.912Z"
     },
     {
       "category": "Route: /pharmacies",
@@ -249,7 +249,7 @@
         "total": 6
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.912Z"
     },
     {
       "category": "Route: /pharmacies",
@@ -260,7 +260,7 @@
         "returnedRadius": 0
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.912Z"
     },
     {
       "category": "Route: /pharmacies",
@@ -270,19 +270,19 @@
         "total": 6
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.912Z"
     },
     {
       "category": "Route: /pharmacies/[id]/reserve",
       "name": "Valid reservation creates CONFIRMED hold, DG-XXXX pickup code, exact unit & total prices, 24h expiration",
       "passed": true,
       "details": {
-        "pickupCode": "DG-9859",
+        "pickupCode": "DG-2004",
         "totalPrice": 960,
-        "expiresAt": "2026-08-28T20:10:43.560Z"
+        "expiresAt": "2026-08-28T20:16:26.913Z"
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.913Z"
     },
     {
       "category": "Route: /pharmacies/[id]/reserve",
@@ -297,7 +297,7 @@
         "severity": "LOW",
         "description": "Mock implementation falls back to array index 0 rather than returning null for 404 response."
       },
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.913Z"
     },
     {
       "category": "Route: /telemetry/health",
@@ -314,7 +314,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.913Z"
     },
     {
       "category": "Route: /telemetry/metrics",
@@ -326,7 +326,7 @@
         "cpu": 8.5
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.560Z"
+      "timestamp": "2026-08-27T20:16:26.913Z"
     },
     {
       "category": "Route: /telemetry/metrics/history",
@@ -337,7 +337,7 @@
         "step": "1m"
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.561Z"
+      "timestamp": "2026-08-27T20:16:26.913Z"
     },
     {
       "category": "Route: /search/suggestions",
@@ -349,7 +349,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.561Z"
+      "timestamp": "2026-08-27T20:16:26.914Z"
     },
     {
       "category": "Route: /search/suggestions",
@@ -363,7 +363,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.561Z"
+      "timestamp": "2026-08-27T20:16:26.914Z"
     },
     {
       "category": "Route: /search/suggestions",
@@ -375,7 +375,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.561Z"
+      "timestamp": "2026-08-27T20:16:26.914Z"
     },
     {
       "category": "Route: /search/suggestions",
@@ -386,7 +386,7 @@
         "count": 0
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.562Z"
+      "timestamp": "2026-08-27T20:16:26.914Z"
     },
     {
       "category": "Calculations",
@@ -429,7 +429,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.562Z"
+      "timestamp": "2026-08-27T20:16:26.914Z"
     },
     {
       "category": "Calculations",
@@ -512,7 +512,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.562Z"
+      "timestamp": "2026-08-27T20:16:26.915Z"
     },
     {
       "category": "Calculations",
@@ -527,7 +527,7 @@
         }
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.562Z"
+      "timestamp": "2026-08-27T20:16:26.915Z"
     },
     {
       "category": "Calculations",
@@ -573,7 +573,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.563Z"
+      "timestamp": "2026-08-27T20:16:26.915Z"
     },
     {
       "category": "RFC 7807 Compliance",
@@ -588,7 +588,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.564Z"
+      "timestamp": "2026-08-27T20:16:26.916Z"
     },
     {
       "category": "Contract Fidelity",
@@ -607,7 +607,7 @@
         ]
       },
       "finding": null,
-      "timestamp": "2026-08-27T20:10:43.564Z"
+      "timestamp": "2026-08-27T20:16:26.916Z"
     }
   ]
 }
