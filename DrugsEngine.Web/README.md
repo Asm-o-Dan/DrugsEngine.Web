@@ -1,61 +1,57 @@
-# 💊 DrugsEngine.Web
+# DrugsEngine Web
 
-> **Production-grade, modern Next.js 15 frontend web application for the DrugsEngine distributed pharmacy platform.**
+Веб-клиент DrugsEngine: поиск лекарств и сравнение цен в аптеках.
 
----
+## Запуск
 
-## 🌟 Key Features
+```bash
+npm ci
+cp .env.example .env.local   # по умолчанию — демо-данные
+npm run dev                  # http://localhost:3001
+```
 
-1. **🔍 Universal Smart Search:**
-   - Real-time instant search with 300ms debounce.
-   - Dual-mode: Exact catalog search & AI/Semantic natural language search.
-   - Intelligent suggestions and active ingredient highlighting.
+Чтобы подключить реальный бэкенд, задайте `DRUGSENGINE_API_URL` (и, при желании, `DRUGSENGINE_DATA_SOURCE=api`).
+Контракт, который должен реализовать бэкенд, описан в [docs/API.md](docs/API.md).
 
-2. **🧪 Drug Details & Qdrant Vector Analogs:**
-   - Full active substance, dosage, and medical instructions overview.
-   - Real-time semantic analog matching via **Qdrant Vector Database** (% similarity score).
-   - Dynamic price comparison against market alternatives.
+| Команда | Что делает |
+|---|---|
+| `npm run dev` | dev-сервер на порту 3001 |
+| `npm run build && npm start` | продакшн-сборка и запуск |
+| `npm run typecheck` | проверка типов |
 
-3. **🗺️ Pharmacy Map & Real-time Stock:**
-   - Interactive availability map for Tiraspol, Chisinau, and regional pharmacies.
-   - Stock status indicators (In Stock, Low Stock, On Order).
-   - Fast reservation and route navigation.
+## Как устроено получение данных
 
-4. **📊 System Observability & Telemetry:**
-   - Real-time health monitoring of .NET 8 Web API, Kafka, RabbitMQ, Qdrant, and PostgreSQL.
-   - Vector indexing counters and message throughput stats.
+```
+Server Component / Route Handler
+        │  getDataSource()            lib/server/source/index.ts
+        ├── HttpDataSource            → бэкенд, timeout, кеш Next (revalidate), валидация zod
+        └── DemoDataSource            → lib/server/demo/fixtures.ts
+```
 
----
+- Страницы — серверные компоненты: данные загружаются на сервере, браузер получает готовый HTML.
+- Состояние поиска (запрос, режим, фильтры, сортировка, страница) хранится в URL; фильтры и пагинация — обычные ссылки.
+- Ответы бэкенда валидируются схемами из `lib/contracts.ts` — единым источником типов.
+- **Нет тихого отката на моки.** Если API недоступен, пользователь видит ошибку (`app/error.tsx`),
+  а `/status` показывает состояние бэкенда. Демо-режим включается только явно и помечается баннером.
+- Браузер обращается только к `/api/suggest` (подсказки); адрес бэкенда наружу не уходит.
+- Блок «Похожие препараты» загружается отдельно (стриминг): если векторный поиск упал, остальная страница всё равно открывается.
 
-## 🛠️ Technology Stack
+## Структура
 
-- **Framework:** Next.js 15 (App Router), React 19, TypeScript
-- **Styling & UI:** Tailwind CSS, shadcn/ui design tokens (Slate + Emerald)
-- **Theme:** Dark / Light mode with 
-ext-themes
-- **Icons:** Lucide React
-- **API Architecture:** OpenAPI 3.1 Contract-First Architecture
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+ / npm
-
-### Installation & Run
-`ash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-`
-
-Open [http://localhost:3001](http://localhost:3001) in your browser.
-
----
-
-## 📋 Development Workflow & Kanban
-
-This project was engineered following an end-to-end multi-agent team lifecycle (Team Lead, UX/UI, Backend, Frontend, QA). See KANBAN.md for task breakdown and verification records.
+```
+app/                 страницы (App Router)
+  page.tsx           главная
+  search/            каталог и поиск
+  drugs/[id]/        карточка препарата: цены в аптеках, похожие препараты
+  pharmacies/        список аптек и страница аптеки
+  status/            состояние сервиса
+  api/suggest/       подсказки для поиска
+components/
+  ui/                примитивы (кнопка, бейдж, карточка, скелетон, пустые состояния)
+  site/              шапка, подвал, тема, демо-баннер
+  search/ drug/ pharmacy/
+lib/
+  contracts.ts       схемы zod и типы
+  server/source/     источники данных
+  format.ts          цены, даты, склонения
+```

@@ -1,70 +1,38 @@
 import type { Config } from "tailwindcss";
 
+const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
 const config: Config = {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts1jsx,tsx,mdx}",
-  ],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
+    container: { center: true, padding: { DEFAULT: "1rem", sm: "1.5rem" }, screens: { "2xl": "1200px" } },
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)",
-        },
-        popover: {
-          DEFAULT: "var(--popover)",
-          foreground: "var(--popover-foreground)",
-        },
-        primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
-          hover: "var(--primary-hover)",
-          glow: "var(--primary-glow)",
-        },
-        secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)",
-        },
-        muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
-        },
-        accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
-        },
-        destructive: {
-          DEFAULT: "var(--destructive)",
-          foreground: "var(--destructive-foreground)",
-        },
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
-        vector: {
-          DEFAULT: "var(--vector)",
-          glow: "var(--vector-glow)",
-        }
+      fontFamily: {
+        sans: ['"Manrope Variable"', "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc((var(--radius) - 2px)",
-        sm: "calc((var(--radius) - 4px)",
-        xl: "calc((var(--radius) + 4px)",
-        "2rl": "calc((var(--radius) + 8px)",
+      colors: {
+        bg: token("bg"),
+        surface: { DEFAULT: token("surface"), 2: token("surface-2") },
+        ink: { DEFAULT: token("ink"), 2: token("ink-2"), 3: token("ink-3") },
+        line: { DEFAULT: token("line"), strong: token("line-strong") },
+        brand: { DEFAULT: token("brand"), ink: token("brand-ink"), soft: token("brand-soft"), hover: token("brand-hover") },
+        deal: { DEFAULT: token("deal"), ink: token("deal-ink") },
+        warn: { DEFAULT: token("warn"), soft: token("warn-soft") },
+        danger: { DEFAULT: token("danger"), soft: token("danger-soft") },
+      },
+      borderRadius: { card: "16px", control: "10px" },
+      boxShadow: {
+        card: "0 1px 0 rgb(var(--shadow) / 0.04), 0 1px 3px rgb(var(--shadow) / 0.06)",
+        pop: "0 12px 32px -8px rgb(var(--shadow) / 0.22), 0 2px 6px rgb(var(--shadow) / 0.08)",
       },
       keyframes: {
-        pulseGlow: {
-          "0%, 100%": { opacity: "1", transform: "scale(1)" },
-          "50%": { opacity: "0.7", transform: "scale(1.05)" },
-        },
+        shimmer: { "100%": { transform: "translateX(100%)" } },
+        "fade-up": { from: { opacity: "0", transform: "translateY(4px)" }, to: { opacity: "1", transform: "none" } },
       },
       animation: {
-        "pulse-glow": "pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        shimmer: "shimmer 1.4s infinite",
+        "fade-up": "fade-up 160ms ease-out",
       },
     },
   },
