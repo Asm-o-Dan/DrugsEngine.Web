@@ -67,7 +67,7 @@ export default async function DrugPage({ params }: PageProps) {
           <section id="offers" aria-labelledby="offers-title" className="scroll-mt-24">
             <div className="mb-4">
               <h2 id="offers-title" className="text-lg font-bold tracking-tight text-ink">Цены в аптеках</h2>
-              <p className="mt-0.5 text-sm text-ink-2">От дешёвых к дорогим. Наличие лучше уточнить по телефону.</p>
+              <p className="mt-0.5 text-sm text-ink-2">Нажмите «Рядом со мной» — покажем ближайшую аптеку. Наличие лучше уточнить по телефону.</p>
             </div>
             {drug.offers.length > 0 ? (
               <OffersList offers={drug.offers} />

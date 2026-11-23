@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Store } from "lucide-react";
-import { PharmacyCard } from "@/components/pharmacy/PharmacyCard";
+import { PharmaciesExplorer } from "@/components/pharmacy/PharmaciesExplorer";
 import { StateMessage } from "@/components/ui/state";
 import { getDataSource } from "@/lib/server/source";
 import { countLabel } from "@/lib/format";
@@ -53,12 +53,6 @@ export default async function PharmaciesPage({ searchParams }: PageProps) {
   const filter = { network: one(raw.network), city: one(raw.city) };
   const list = await getDataSource().listPharmacies(filter);
 
-  const byCity = new Map<string, typeof list.items>();
-  for (const p of list.items) byCity.set(p.city, [...(byCity.get(p.city) ?? []), p]);
-  const cities = [...byCity.keys()].sort(
-    (a, b) => byCity.get(b)!.length - byCity.get(a)!.length || a.localeCompare(b, "ru"),
-  );
-
   return (
     <div className="container py-8">
       <h1 className="text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">Аптеки</h1>
@@ -71,7 +65,7 @@ export default async function PharmaciesPage({ searchParams }: PageProps) {
         <Chips label="Город" values={list.cities} active={filter.city} make={(v) => hrefWith(filter, { city: v })} />
       </div>
 
-      {cities.length === 0 ? (
+      {list.items.length === 0 ? (
         <div className="mt-8 rounded-card border border-dashed border-line-strong">
           <StateMessage
             icon={<Store />}
@@ -82,22 +76,8 @@ export default async function PharmaciesPage({ searchParams }: PageProps) {
           </StateMessage>
         </div>
       ) : (
-        <div className="mt-8 space-y-10">
-          {cities.map((city) => (
-            <section key={city} aria-labelledby={`city-${city}`}>
-              <h2 id={`city-${city}`} className="flex items-baseline gap-2 text-lg font-bold text-ink">
-                {city}
-                <span className="num text-sm font-semibold text-ink-3">{byCity.get(city)!.length}</span>
-              </h2>
-              <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {byCity.get(city)!.map((p) => (
-                  <li key={p.id}>
-                    <PharmacyCard pharmacy={p} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+        <div className="mt-6">
+          <PharmaciesExplorer items={list.items} />
         </div>
       )}
     </div>

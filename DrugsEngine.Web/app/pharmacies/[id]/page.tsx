@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Clock, MapPin, Phone } from "lucide-react";
 import { Assortment } from "@/components/pharmacy/Assortment";
+import { PharmacyLocation } from "@/components/pharmacy/PharmacyLocation";
 import { buttonStyles } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getPharmacy } from "@/lib/server/queries";
@@ -47,6 +48,7 @@ export default async function PharmacyPage({ params }: PageProps) {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Card className="space-y-4 p-5 text-sm">
+            <PharmacyLocation pharmacy={pharmacy} />
             {pharmacy.hours ? (
               <p className="flex items-start gap-2.5 text-ink">
                 <Clock className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden /> {pharmacy.hours}
@@ -67,7 +69,7 @@ export default async function PharmacyPage({ params }: PageProps) {
                 rel="noreferrer"
                 className={buttonStyles({ variant: "secondary", size: "lg", className: "w-full" })}
               >
-                <MapPin /> Открыть на карте
+                <MapPin /> Открыть в Яндекс Картах
               </a>
             </div>
           </Card>

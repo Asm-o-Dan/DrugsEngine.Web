@@ -332,13 +332,13 @@ export const DEMO_DRUGS: DemoDrug[] = [
 ];
 
 export const DEMO_PHARMACIES: Pharmacy[] = [
-  { id: pid(1), network: "Доктор", number: 1, city: "Тирасполь", address: "ул. 25 Октября, 94", phone: "(533) 9-11-01", hours: "Ежедневно 8:00–21:00", location: null },
-  { id: pid(2), network: "Доктор", number: 3, city: "Тирасполь", address: "ул. Карла Либкнехта, 159", phone: "(533) 9-11-03", hours: "Ежедневно 8:00–20:00", location: null },
-  { id: pid(3), network: "Доктор", number: 5, city: "Тирасполь", address: "ул. Юности, 18/1", phone: "(533) 9-11-05", hours: "Круглосуточно", location: null },
-  { id: pid(4), network: "Доктор", number: 7, city: "Тирасполь", address: "ул. Шевченко, 81/7", phone: "(533) 9-11-07", hours: "Пн–Сб 8:00–19:00", location: null },
-  { id: pid(5), network: "Доктор", number: 9, city: "Тирасполь", address: "ул. Мира, 46", phone: "(533) 9-11-09", hours: "Ежедневно 8:00–20:00", location: null },
-  { id: pid(6), network: "Доктор", number: 12, city: "Днестровск", address: "ул. Энергетиков, 2", phone: "(219) 7-12-42", hours: "Пн–Сб 8:00–18:00", location: null },
-  { id: pid(7), network: "ВиваФарм", number: 2, city: "Тирасполь", address: "ул. Ленина, 31", phone: "(533) 6-40-02", hours: "Ежедневно 8:00–21:00", location: null },
-  { id: pid(8), network: "ВиваФарм", number: 4, city: "Тирасполь", address: "пр. 25 Октября, 128", phone: "(533) 6-40-04", hours: "Ежедневно 9:00–20:00", location: null },
-  { id: pid(9), network: "ВиваФарм", number: 6, city: "Бендеры", address: "ул. Суворова, 12", phone: "(552) 2-30-06", hours: "Пн–Пт 8:00–19:00", location: null },
+  { id: pid(1), network: "Доктор", number: 1, city: "Тирасполь", address: "ул. 25 Октября, 94", phone: "(533) 9-11-01", hours: "Ежедневно 8:00–21:00", location: { lat: 46.8417, lng: 29.6302 } },
+  { id: pid(2), network: "Доктор", number: 3, city: "Тирасполь", address: "ул. Карла Либкнехта, 159", phone: "(533) 9-11-03", hours: "Ежедневно 8:00–20:00", location: { lat: 46.8463, lng: 29.6228 } },
+  { id: pid(3), network: "Доктор", number: 5, city: "Тирасполь", address: "ул. Юности, 18/1", phone: "(533) 9-11-05", hours: "Круглосуточно", location: { lat: 46.8584, lng: 29.6146 } },
+  { id: pid(4), network: "Доктор", number: 7, city: "Тирасполь", address: "ул. Шевченко, 81/7", phone: "(533) 9-11-07", hours: "Пн–Сб 8:00–19:00", location: { lat: 46.8492, lng: 29.6108 } },
+  { id: pid(5), network: "Доктор", number: 9, city: "Тирасполь", address: "ул. Мира, 46", phone: "(533) 9-11-09", hours: "Ежедневно 8:00–20:00", location: { lat: 46.8352, lng: 29.6197 } },
+  { id: pid(6), network: "Доктор", number: 12, city: "Днестровск", address: "ул. Энергетиков, 2", phone: "(219) 7-12-42", hours: "Пн–Сб 8:00–18:00", location: { lat: 46.6196, lng: 29.9138 } },
+  { id: pid(7), network: "ВиваФарм", number: 2, city: "Тирасполь", address: "ул. Ленина, 31", phone: "(533) 6-40-02", hours: "Ежедневно 8:00–21:00", location: { lat: 46.8391, lng: 29.6381 } },
+  { id: pid(8), network: "ВиваФарм", number: 4, city: "Тирасполь", address: "пр. 25 Октября, 128", phone: "(533) 6-40-04", hours: "Ежедневно 9:00–20:00", location: { lat: 46.8439, lng: 29.6152 } },
+  { id: pid(9), network: "ВиваФарм", number: 6, city: "Бендеры", address: "ул. Суворова, 12", phone: "(552) 2-30-06", hours: "Пн–Пт 8:00–19:00", location: { lat: 46.8312, lng: 29.4779 } },
 ];

@@ -58,3 +58,8 @@ export function telHref(phone: string): string {
 export function mapHref(city: string, address: string): string {
   return `https://yandex.ru/maps/?text=${encodeURIComponent(`${city}, ${address}`)}`;
 }
+
+/** Компактная цена для маркера на карте: «23,50». */
+export function formatPriceShort(value: number): string {
+  return priceFormatter.format(value);
+}
