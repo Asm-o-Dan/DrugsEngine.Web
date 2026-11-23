@@ -27,6 +27,16 @@
 - `manufacturer` — точное значение из `facets.manufacturers[].value`; `country` — ISO-код из `facets.countries[].value`.
 - Фасеты считаются по всей выдаче запроса **до** применения фильтров `manufacturer`/`country`.
 
+## Реализация в бэкенде
+
+Эндпоинты реализованы в DrugsEngine (`Infrastructure/API/Controllers/V1`, запросы — `Infrastructure/Dal/Queries/CatalogQueries.cs`).
+
+- `exact`: подстрока в названии/производителе (ILIKE) + триграммное сходство слов (pg_trgm) — находит запросы с опечатками.
+- `semantic`, `analogs`, описание препарата — через HTTP API DrugsEnginePythonService. Если он не настроен или недоступен,
+  `search?mode=semantic` и `analogs` отвечают **503** (problem+json); веб-клиент показывает понятное сообщение.
+  Порог релевантности — `SemanticSearch:MinScore` / `MinSimilarity`.
+- `popular`: данных о популярности запросов пока нет — отдаются препараты, которые продаются в наибольшем числе аптек.
+
 ## Соответствие доменной модели бэкенда
 
 | Поле контракта | Откуда в DrugsEngine |

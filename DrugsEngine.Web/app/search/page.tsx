@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ChevronDown, SearchX, Sparkles } from "lucide-react";
+import { ChevronDown, CloudOff, SearchX, Sparkles } from "lucide-react";
 import { DrugRow } from "@/components/drug/DrugCard";
 import { FacetGroup, ModeSwitch, Pagination } from "@/components/search/Facets";
 import { SortSelect } from "@/components/search/SortSelect";
 import { StateMessage } from "@/components/ui/state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buttonStyles } from "@/components/ui/button";
-import { getDataSource } from "@/lib/server/source";
+import { DataSourceError, getDataSource } from "@/lib/server/source";
 import { parseSearchParams, searchHref } from "@/lib/search-params";
 import { countLabel } from "@/lib/format";
 import type { SearchParams, SearchResponse } from "@/lib/contracts";
@@ -48,7 +48,17 @@ function Heading({ params, total }: { params: SearchParams; total?: number }) {
 }
 
 async function Results({ params }: { params: SearchParams }) {
-  const result = await getDataSource().searchDrugs(params);
+  let result;
+  try {
+    result = await getDataSource().searchDrugs(params);
+  } catch (error) {
+    // Поиск по смыслу зависит от отдельного сервиса: если он недоступен, предлагаем обычный поиск,
+    // а не показываем общий экран ошибки.
+    if (params.mode === "semantic" && error instanceof DataSourceError && error.status === 503) {
+      return <SemanticUnavailable params={params} />;
+    }
+    throw error;
+  }
   const hasFilters = Boolean(params.manufacturer || params.country);
 
   return (
@@ -119,6 +129,28 @@ async function Results({ params }: { params: SearchParams }) {
             </div>
           )}
         </section>
+      </div>
+    </>
+  );
+}
+
+function SemanticUnavailable({ params }: { params: SearchParams }) {
+  return (
+    <>
+      <Heading params={params} total={0} />
+      <div className="mt-6 rounded-card border border-dashed border-line-strong">
+        <StateMessage
+          icon={<CloudOff />}
+          title="Поиск по симптомам временно недоступен"
+          action={
+            <Link className={buttonStyles()} href={searchHref({ q: params.q, mode: "exact" })}>
+              Искать по названию
+            </Link>
+          }
+        >
+          Сервис, который подбирает препараты по описанию, сейчас не отвечает. Поиск по названию и действующему веществу
+          работает.
+        </StateMessage>
       </div>
     </>
   );

@@ -32,11 +32,18 @@ export function AnalogList({ analogs, basePrice, baseIngredient }: { analogs: An
                 <p className="truncate font-semibold text-ink group-hover:text-brand">{a.name}</p>
                 <p className="mt-0.5 truncate text-sm text-ink-2">
                   {sameIngredient ? (
-                    <span className="font-semibold text-brand">То же вещество</span>
+                    <>
+                      <span className="font-semibold text-brand">То же вещество</span>
+                      <span className="text-ink-3"> · {a.manufacturer}</span>
+                    </>
+                  ) : a.activeIngredient ? (
+                    <>
+                      {a.activeIngredient}
+                      <span className="text-ink-3"> · {a.manufacturer}</span>
+                    </>
                   ) : (
-                    a.activeIngredient ?? a.manufacturer
+                    a.manufacturer
                   )}
-                  <span className="text-ink-3"> · {a.manufacturer}</span>
                 </p>
                 <div className="mt-2 flex items-center gap-2" title="Насколько похожи описания препаратов">
                   <div className="h-1.5 w-24 overflow-hidden rounded-full bg-surface-2" aria-hidden>
