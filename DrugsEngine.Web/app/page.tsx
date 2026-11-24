@@ -120,7 +120,7 @@ export default async function HomePage() {
       {popular.length > 0 ? (
         <section className="container py-14">
           <SectionTitle
-            title="Часто ищут"
+            title="Есть в большинстве аптек"
             action={
               <Link href="/search" className="inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline">
                 Весь каталог <ArrowRight className="size-4" aria-hidden />

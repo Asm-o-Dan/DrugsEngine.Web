@@ -64,6 +64,10 @@ export function OffersList({ offers }: { offers: Offer[] }) {
     ? rows.reduce<Row | null>((n, r) => (r.distanceKm != null && (!n || r.distanceKm < n.distanceKm!) ? r : n), null)
     : null;
 
+  // при одинаковой минимальной цене «Дешевле всего» — все такие аптеки
+  const hasSpread = rows.some((r) => r.price !== cheapest?.price);
+  const isCheapest = (r: Row) => hasSpread && cheapest != null && r.price === cheapest.price;
+
   const points: MapPoint[] = React.useMemo(
     () =>
       rows
@@ -74,9 +78,10 @@ export function OffersList({ offers }: { offers: Offer[] }) {
           lng: r.pharmacy.location!.lng,
           label: formatPriceShort(r.price),
           title: `${r.pharmacy.network} №${r.pharmacy.number}, ${r.pharmacy.address} — ${formatPrice(r.price)}`,
-          tone: nearest?.pharmacy.id === r.pharmacy.id ? "nearest" : cheapest?.pharmacy.id === r.pharmacy.id && rows.length > 1 ? "best" : "default",
+          tone: nearest?.pharmacy.id === r.pharmacy.id ? "nearest" : isCheapest(r) ? "best" : "default",
         })),
-    [rows, nearest?.pharmacy.id, cheapest?.pharmacy.id],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, nearest?.pharmacy.id, cheapest?.price, hasSpread],
   );
 
   const focus = React.useMemo(
@@ -201,7 +206,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
       <ol className="divide-y divide-dashed divide-line rounded-card border border-line bg-surface shadow-card">
         {rows.map((offer) => {
           const p = offer.pharmacy;
-          const isBest = offer.pharmacy.id === cheapest?.pharmacy.id && rows.length > 1;
+          const isBest = isCheapest(offer);
           const isNearest = offer.pharmacy.id === nearest?.pharmacy.id;
           const selected = selectedId === p.id;
           return (
