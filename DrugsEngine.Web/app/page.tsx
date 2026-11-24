@@ -14,9 +14,9 @@ const QUICK_QUERIES = [
   { label: "Ибупрофен", q: "ибупрофен", mode: "exact" as const },
   { label: "Омепразол", q: "омепразол", mode: "exact" as const },
   { label: "Но-шпа", q: "но-шпа", mode: "exact" as const },
-  { label: "от аллергии", q: "аллергия", mode: "semantic" as const },
-  { label: "от изжоги", q: "изжога", mode: "semantic" as const },
-  { label: "при температуре", q: "температура", mode: "semantic" as const },
+  { label: "от аллергии", q: "от аллергии", mode: "semantic" as const },
+  { label: "от изжоги", q: "от изжоги", mode: "semantic" as const },
+  { label: "от кашля", q: "от кашля", mode: "semantic" as const },
 ];
 
 function ReceiptPreview({ drug }: { drug: DrugDetails }) {

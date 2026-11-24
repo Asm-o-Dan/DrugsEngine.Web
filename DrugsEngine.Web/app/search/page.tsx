@@ -67,7 +67,7 @@ async function Results({ params }: { params: SearchParams }) {
       {params.mode === "semantic" ? (
         <p className="mt-3 flex items-start gap-2 text-sm text-ink-2">
           <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
-          Ищем по смыслу описаний — подойдут запросы вроде «от изжоги» или «при температуре». Выбор препарата
+          Ищем по смыслу названий и описаний — подойдут запросы вроде «от изжоги» или «от кашля». Выбор препарата
           согласуйте с врачом или фармацевтом.
         </p>
       ) : null}

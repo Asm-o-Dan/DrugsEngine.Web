@@ -45,12 +45,15 @@ export function AnalogList({ analogs, basePrice, baseIngredient }: { analogs: An
                     a.manufacturer
                   )}
                 </p>
-                <div className="mt-2 flex items-center gap-2" title="Насколько похожи описания препаратов">
-                  <div className="h-1.5 w-24 overflow-hidden rounded-full bg-surface-2" aria-hidden>
-                    <div className="h-full rounded-full bg-brand" style={{ width: `${Math.round(a.similarity * 100)}%` }} />
+                {/* у аналогов по веществу «сходство» — не оценка модели, полосу не показываем */}
+                {!sameIngredient ? (
+                  <div className="mt-2 flex items-center gap-2" title="Насколько похожи описания препаратов">
+                    <div className="h-1.5 w-24 overflow-hidden rounded-full bg-surface-2" aria-hidden>
+                      <div className="h-full rounded-full bg-brand" style={{ width: `${Math.round(a.similarity * 100)}%` }} />
+                    </div>
+                    <span className="num text-xs text-ink-3">сходство {Math.round(a.similarity * 100)}%</span>
                   </div>
-                  <span className="num text-xs text-ink-3">сходство {Math.round(a.similarity * 100)}%</span>
-                </div>
+                ) : null}
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 {a.minPrice != null ? (
