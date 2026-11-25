@@ -41,10 +41,14 @@ export const DrugSummarySchema = z.object({
   updatedAt: z.string().nullable(),
 });
 
+export const StockLevelSchema = z.enum(["low", "medium", "high"]);
+
 export const OfferSchema = z.object({
   pharmacy: PharmacySchema,
   price: z.number(),
   quantity: z.number().nullable(),
+  /** Уровень остатка, если сеть его сообщает («Столетник» — да, «Доктор» — нет). */
+  stockLevel: StockLevelSchema.nullable().optional(),
   updatedAt: z.string(),
 });
 
@@ -129,6 +133,7 @@ export type Country = z.infer<typeof CountrySchema>;
 export type Pharmacy = z.infer<typeof PharmacySchema>;
 export type DrugSummary = z.infer<typeof DrugSummarySchema>;
 export type Offer = z.infer<typeof OfferSchema>;
+export type StockLevel = z.infer<typeof StockLevelSchema>;
 export type DrugDetails = z.infer<typeof DrugDetailsSchema>;
 export type Analog = z.infer<typeof AnalogSchema>;
 export type SearchMode = z.infer<typeof SearchModeSchema>;

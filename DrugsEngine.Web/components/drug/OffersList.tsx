@@ -243,6 +243,11 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                 <span>
                   {p.city}, {p.address}
                 </span>
+                {offer.stockLevel === "low" ? (
+                  <Badge tone="warn">Осталось мало</Badge>
+                ) : offer.stockLevel === "high" ? (
+                  <span className="text-ink-3">В наличии много</span>
+                ) : null}
                 {offer.distanceKm != null ? (
                   <span className="num font-semibold text-ink">{formatDistance(offer.distanceKm)}</span>
                 ) : null}
