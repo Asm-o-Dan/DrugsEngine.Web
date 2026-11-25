@@ -29,6 +29,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
   const user = location.position;
   const [pickMode, setPickMode] = React.useState(false);
   const [city, setCity] = React.useState<string>(ALL);
+  const [network, setNetwork] = React.useState<string>(ALL);
   const [sort, setSort] = React.useState<Sort>("price");
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const rowRefs = React.useRef(new Map<string, HTMLLIElement>());
@@ -44,10 +45,14 @@ export function OffersList({ offers }: { offers: Offer[] }) {
     () => [...new Set(offers.map((o) => o.pharmacy.city))].sort((a, b) => a.localeCompare(b, "ru")),
     [offers],
   );
+  const networks = React.useMemo(
+    () => [...new Set(offers.map((o) => o.pharmacy.network))].sort((a, b) => a.localeCompare(b, "ru")),
+    [offers],
+  );
 
   const rows: Row[] = React.useMemo(() => {
     const withDistance = offers
-      .filter((o) => city === ALL || o.pharmacy.city === city)
+      .filter((o) => (city === ALL || o.pharmacy.city === city) && (network === ALL || o.pharmacy.network === network))
       .map((o) => ({
         ...o,
         distanceKm: user && o.pharmacy.location ? distanceKm(user, o.pharmacy.location) : null,
@@ -57,7 +62,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
         ? (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity) || a.price - b.price
         : a.price - b.price,
     );
-  }, [offers, city, sort, user]);
+  }, [offers, city, network, sort, user]);
 
   const cheapest = rows.reduce<Row | null>((best, r) => (!best || r.price < best.price ? r : best), null);
   const nearest = user
@@ -148,6 +153,31 @@ export function OffersList({ offers }: { offers: Offer[] }) {
           from={user}
           onSelect={showOnMap}
         />
+      ) : null}
+
+      {networks.length > 1 ? (
+        <div role="group" aria-label="Сеть аптек" className="flex flex-wrap gap-1.5 pt-1">
+          {[ALL, ...networks].map((n) => {
+            const count = n === ALL ? offers.length : offers.filter((o) => o.pharmacy.network === n).length;
+            return (
+              <button
+                key={n}
+                type="button"
+                aria-pressed={network === n}
+                onClick={() => setNetwork(n)}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
+                  network === n
+                    ? "border-brand bg-brand text-brand-ink"
+                    : "border-line bg-surface text-ink-2 hover:border-line-strong hover:text-ink",
+                )}
+              >
+                {n === ALL ? "Все сети" : n}
+                <span className={cn("num ml-1.5", network === n ? "text-brand-ink/70" : "text-ink-3")}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
       ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
