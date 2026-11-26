@@ -23,30 +23,23 @@ export default async function PharmacyPage({ params }: PageProps) {
   return (
     <div className="container py-6 sm:py-8">
       <nav aria-label="Навигация" className="flex items-center gap-1 text-sm text-ink-3">
-        <Link href="/pharmacies" className="hover:text-ink">Аптеки</Link>
+        <Link href="/pharmacies" className="hit hover:text-ink">Аптеки</Link>
         <ChevronRight className="size-4" aria-hidden />
         <span className="truncate text-ink-2">{pharmacy.network} №{pharmacy.number}</span>
       </nav>
 
-      <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_340px]">
-        <div className="min-w-0">
+      {/* На телефоне контакты идут сразу под заголовком, а не после всего ассортимента */}
+      <div className="mt-4 grid gap-x-8 gap-y-6 lg:grid-cols-[1fr_340px]">
+        <header className="min-w-0 lg:col-start-1">
           <h1 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             {pharmacy.network} №{pharmacy.number}
           </h1>
           <p className="mt-2 text-ink-2">
             {pharmacy.city}, {pharmacy.address}
           </p>
+        </header>
 
-          <section className="mt-8" aria-labelledby="assortment-title">
-            <h2 id="assortment-title" className="mb-1 text-lg font-bold text-ink">Цены в этой аптеке</h2>
-            <p className="mb-4 text-sm text-ink-2">
-              {countLabel(pharmacy.offers.length, "препарат", "препарата", "препаратов")} из нашего каталога.
-            </p>
-            <Assortment offers={pharmacy.offers} />
-          </section>
-        </div>
-
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
           <Card className="space-y-4 p-5 text-sm">
             <PharmacyLocation pharmacy={pharmacy} />
             {pharmacy.hours ? (
@@ -74,6 +67,14 @@ export default async function PharmacyPage({ params }: PageProps) {
             </div>
           </Card>
         </aside>
+
+        <section className="min-w-0 lg:col-start-1 lg:mt-2" aria-labelledby="assortment-title">
+          <h2 id="assortment-title" className="mb-1 text-lg font-bold text-ink">Цены в этой аптеке</h2>
+          <p className="mb-4 text-sm text-ink-2">
+            {countLabel(pharmacy.offers.length, "препарат", "препарата", "препаратов")} из нашего каталога.
+          </p>
+          <Assortment offers={pharmacy.offers} />
+        </section>
       </div>
     </div>
   );

@@ -77,7 +77,7 @@ export function ModeSwitch({ params }: { params: SearchParams }) {
             aria-checked={active}
             href={searchHref({ ...params, mode: m.value, page: 1, manufacturer: undefined, country: undefined })}
             className={cn(
-              "rounded-[8px] px-3 py-1.5 text-sm font-semibold transition-colors",
+              "hit rounded-[8px] px-3 py-1.5 text-sm font-semibold transition-colors",
               active ? "bg-ink text-bg" : "text-ink-2 hover:text-ink",
             )}
           >
@@ -104,7 +104,7 @@ export function Pagination({ params, total }: { params: SearchParams; total: num
             href={searchHref({ ...params, page: n })}
             aria-current={n === current ? "page" : undefined}
             className={cn(
-              "num grid h-9 min-w-9 place-items-center rounded-control px-2 text-sm font-semibold",
+              "hit num grid h-9 min-w-9 place-items-center rounded-control px-2 text-sm font-semibold",
               n === current ? "bg-ink text-bg" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
             )}
           >

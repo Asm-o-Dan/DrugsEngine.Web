@@ -31,10 +31,11 @@ export function Assortment({ offers }: { offers: PharmacyOffer[] }) {
             <li key={o.drug.id}>
               <Link href={`/drugs/${o.drug.id}`} className="group flex items-baseline gap-3 px-4 py-3 sm:px-5">
                 <span className="min-w-0">
-                  <span className="block truncate font-semibold text-ink group-hover:text-brand">{o.drug.name}</span>
+                  <span className="line-clamp-2 font-semibold text-ink group-hover:text-brand">{o.drug.name}</span>
                   <span className="block truncate text-xs text-ink-3">{o.drug.manufacturer}</span>
                 </span>
-                <span className="leader" aria-hidden />
+                {/* пунктир — по первой строке названия, рядом с ценой */}
+                <span className="leader self-baseline" aria-hidden />
                 <span className="num shrink-0 font-bold text-ink">{formatPrice(o.price)}</span>
               </Link>
             </li>

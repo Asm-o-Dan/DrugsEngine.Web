@@ -44,7 +44,7 @@ export function NearestSummary({
             <p className={cn("text-xs font-bold uppercase tracking-[0.08em]", kind === "nearest" ? "text-brand" : "text-ink-3")}>
               {label}
             </p>
-            <button type="button" onClick={() => onSelect(item.id)} className="mt-1 text-left font-bold text-ink hover:text-brand">
+            <button type="button" onClick={() => onSelect(item.id)} className="hit mt-1 text-left font-bold text-ink hover:text-brand">
               {item.title}
             </button>
             <p className="text-sm text-ink-2">{item.address}</p>
@@ -56,7 +56,7 @@ export function NearestSummary({
                 href={routeHref(item.location, from)}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline"
+                className="hit ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline"
               >
                 <Navigation className="size-4" aria-hidden /> Маршрут
               </a>

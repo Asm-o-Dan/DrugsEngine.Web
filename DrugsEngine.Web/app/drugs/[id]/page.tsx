@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ChevronRight, PackageX, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronRight, PackageX, Sparkles } from "lucide-react";
 import { OffersList } from "@/components/drug/OffersList";
 import { AnalogList } from "@/components/drug/AnalogList";
 import { MedicalNotice } from "@/components/drug/MedicalNotice";
@@ -36,7 +36,7 @@ export default async function DrugPage({ params }: PageProps) {
   return (
     <div className="container py-6 sm:py-8">
       <nav aria-label="Навигация" className="flex items-center gap-1 text-sm text-ink-3">
-        <Link href="/search" className="hover:text-ink">Каталог</Link>
+        <Link href="/search" className="hit hover:text-ink">Каталог</Link>
         <ChevronRight className="size-4" aria-hidden />
         <span className="truncate text-ink-2">{drug.name}</span>
       </nav>
@@ -60,6 +60,9 @@ export default async function DrugPage({ params }: PageProps) {
 
         <aside className="space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
           <PriceSummary drug={drug} />
+          <Suspense fallback={null}>
+            <CheaperAnalog drug={drug} />
+          </Suspense>
           <AboutDrug drug={drug} className="hidden lg:block" />
         </aside>
 
@@ -80,7 +83,7 @@ export default async function DrugPage({ params }: PageProps) {
             )}
           </section>
 
-          <section aria-labelledby="analogs-title">
+          <section id="analogs" aria-labelledby="analogs-title" className="scroll-mt-24">
             <div className="mb-4">
               <h2 id="analogs-title" className="text-lg font-bold tracking-tight text-ink">Похожие препараты</h2>
               <p className="mt-0.5 text-sm text-ink-2">Подобраны по сходству описаний и действующих веществ.</p>
@@ -187,6 +190,63 @@ function AboutDrug({ drug, className }: { drug: DrugDetails; className?: string 
           ))}
       </dl>
     </Card>
+  );
+}
+
+/** Дозировки и фасовка из названия: «Флузамед 150мг №1 капс.» → «150мг|№1». Без них сравнивать цены нельзя. */
+function doseKey(name: string): string | null {
+  const text = name.toLocaleLowerCase("ru").replace(/,/g, ".");
+  const doses = [...text.matchAll(/(\d+(?:\.\d+)?)\s*(мкг|мг|мл|г|%|ме)(?![а-я])/g)].map((m) => `${Number(m[1])}${m[2]}`);
+  const pack = text.match(/№\s*(\d+)/)?.[1];
+  if (doses.length === 0 || !pack) return null;
+  return `${[...new Set(doses)].sort().join("+")}|№${Number(pack)}`;
+}
+
+/**
+ * Более дешёвый препарат с тем же веществом, дозировкой, фасовкой и формой — рядом с ценой,
+ * а не под списком аптек, иначе до него на телефоне не долистать. Сравниваем только
+ * сопоставимые упаковки: «50 мг ×10 таб.» против «150 мг ×1 капс.» — не «дешевле», а другой товар.
+ */
+async function CheaperAnalog({ drug }: { drug: DrugDetails }) {
+  if (drug.minPrice == null || !drug.activeIngredient || !drug.form) return null;
+  const ingredient = drug.activeIngredient.toLocaleLowerCase("ru");
+  const dose = doseKey(drug.name);
+  if (!dose) return null;
+  let analogs;
+  try {
+    analogs = await getDataSource().getAnalogs(drug.id, 6);
+  } catch {
+    return null; // блок «Похожие препараты» ниже сам сообщит о сбое
+  }
+  const best = analogs
+    .filter(
+      (a) =>
+        a.minPrice != null &&
+        a.minPrice < drug.minPrice! &&
+        a.activeIngredient?.toLocaleLowerCase("ru") === ingredient &&
+        a.form === drug.form &&
+        doseKey(a.name) === dose,
+    )
+    .sort((a, b) => a.minPrice! - b.minPrice!)[0];
+  if (!best) return null;
+  const pct = Math.round(((drug.minPrice - best.minPrice!) / drug.minPrice) * 100);
+  if (pct < 1) return null;
+
+  return (
+    <Link
+      href={`/drugs/${best.id}`}
+      className="group block rounded-card border border-deal-ink/15 bg-deal/60 p-4 transition-colors hover:bg-deal"
+    >
+      <p className="text-sm font-semibold text-deal-ink">То же вещество и дозировка — на {pct}% дешевле</p>
+      <p className="mt-1 flex items-start justify-between gap-3">
+        <span className="line-clamp-2 font-semibold text-ink">{best.name}</span>
+        <span className="num shrink-0 font-extrabold text-ink">от {formatPrice(best.minPrice!)}</span>
+      </p>
+      <p className="mt-2 flex items-center gap-1 text-xs text-ink-2">
+        Замену согласуйте с врачом или фармацевтом
+        <ArrowRight className="ml-auto size-4 shrink-0 text-deal-ink transition-transform group-hover:translate-x-0.5" aria-hidden />
+      </p>
+    </Link>
   );
 }
 

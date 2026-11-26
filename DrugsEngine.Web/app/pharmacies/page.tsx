@@ -25,8 +25,12 @@ function hrefWith(current: { network?: string; city?: string }, patch: { network
 function Chips({ label, values, active, make }: { label: string; values: string[]; active?: string; make: (v?: string) => string }) {
   if (values.length < 2) return null;
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap items-center gap-1.5">
-      <span className="mr-1 text-sm text-ink-3">{label}:</span>
+    <div
+      role="group"
+      aria-label={label}
+      className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:py-0 [&::-webkit-scrollbar]:hidden"
+    >
+      <span className="mr-1 shrink-0 text-sm text-ink-3">{label}:</span>
       {[undefined, ...values].map((v) => {
         const isActive = v === active;
         return (
@@ -36,7 +40,7 @@ function Chips({ label, values, active, make }: { label: string; values: string[
             scroll={false}
             aria-current={isActive ? "true" : undefined}
             className={cn(
-              "rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
+              "hit shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
               isActive ? "border-ink bg-ink text-bg" : "border-line bg-surface text-ink-2 hover:border-line-strong hover:text-ink",
             )}
           >
@@ -60,7 +64,7 @@ export default async function PharmaciesPage({ searchParams }: PageProps) {
         {countLabel(list.items.length, "аптека", "аптеки", "аптек")}, цены которых мы отслеживаем.
       </p>
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-6 space-y-1 sm:space-y-3">
         <Chips label="Сеть" values={list.networks} active={filter.network} make={(v) => hrefWith(filter, { network: v })} />
         <Chips label="Город" values={list.cities} active={filter.city} make={(v) => hrefWith(filter, { city: v })} />
       </div>

@@ -48,7 +48,7 @@ export function SiteHeader() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "rounded-control px-2 py-2 text-sm font-semibold transition-colors sm:px-3",
+                  "hit rounded-control px-2 py-2 text-sm font-semibold transition-colors sm:px-3",
                   active ? "bg-surface-2 text-ink" : "text-ink-2 hover:text-ink",
                 )}
               >

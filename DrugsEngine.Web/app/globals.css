@@ -10,7 +10,7 @@
     --surface-2: 239 237 231;
     --ink: 23 24 26;
     --ink-2: 84 87 93;
-    --ink-3: 128 131 137;
+    --ink-3: 99 102 108;
     --line: 226 223 215;
     --line-strong: 204 200 190;
     --brand: 11 110 79;
@@ -33,7 +33,7 @@
     --surface-2: 34 35 39;
     --ink: 240 239 236;
     --ink-2: 168 170 176;
-    --ink-3: 125 128 135;
+    --ink-3: 142 145 152;
     --line: 46 48 53;
     --line-strong: 64 67 73;
     --brand: 74 196 146;
@@ -78,6 +78,20 @@
   }
 
   /* Пунктирная «чековая» направляющая между названием и ценой. */
+  /* Зона нажатия не меньше 44×44 без изменения внешнего вида (WCAG 2.5.5). */
+  .hit {
+    @apply relative;
+  }
+  .hit::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
   .leader {
     @apply flex-1 self-end mb-[0.4em] min-w-4 border-b border-dotted border-line-strong;
   }
@@ -137,6 +151,13 @@
   .map-pin--selected {
     @apply ring-4 ring-brand/40;
     transform: translate(-50%, calc(-100% - 6px)) scale(1.12);
+  }
+  /* Группа близко стоящих аптек: ценник «от …» и счётчик */
+  .map-pin--cluster {
+    @apply pr-1;
+  }
+  .map-pin__count {
+    @apply ml-1.5 inline-grid min-w-[18px] place-items-center rounded-full bg-surface px-1 text-[10px] font-extrabold leading-[16px] text-ink;
   }
   .map-user {
     @apply absolute block size-4 rounded-full border-[3px] border-surface bg-[#2563eb];

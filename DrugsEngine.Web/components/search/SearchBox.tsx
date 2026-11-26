@@ -35,8 +35,9 @@ export function SearchBox({
   size = "md",
   autoFocus,
   className,
-  placeholder = "Название лекарства или действующее вещество",
+  placeholder: placeholderProp,
 }: SearchBoxProps) {
+  const placeholder = useDefaultPlaceholder(placeholderProp);
   const router = useRouter();
   const listId = React.useId();
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -159,7 +160,7 @@ export function SearchBox({
               setValue("");
               inputRef.current?.focus();
             }}
-            className="grid size-8 shrink-0 place-items-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink"
+            className="hit grid size-8 shrink-0 place-items-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink"
           >
             <X className="size-4" />
           </button>
@@ -211,4 +212,21 @@ export function SearchBox({
       ) : null}
     </form>
   );
+}
+
+const LONG_PLACEHOLDER = "Название лекарства или действующее вещество";
+const SHORT_PLACEHOLDER = "Лекарство или вещество";
+
+/** На узком экране длинная подсказка обрезается посередине слова — там показываем короткую. */
+function useDefaultPlaceholder(explicit?: string) {
+  const [wide, setWide] = React.useState(false);
+  React.useEffect(() => {
+    if (explicit) return;
+    const mq = window.matchMedia("(min-width: 640px)");
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [explicit]);
+  return explicit ?? (wide ? LONG_PLACEHOLDER : SHORT_PLACEHOLDER);
 }

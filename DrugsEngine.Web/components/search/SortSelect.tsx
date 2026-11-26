@@ -18,7 +18,7 @@ export function SortSelect({ params }: { params: SearchParams }) {
   const [pending, startTransition] = useTransition();
   return (
     <label className="flex items-center gap-2 text-sm text-ink-2">
-      <span className="hidden sm:inline">Сортировка</span>
+      <span className="sr-only sm:not-sr-only">Сортировка</span>
       <select
         value={params.sort}
         onChange={(e) =>

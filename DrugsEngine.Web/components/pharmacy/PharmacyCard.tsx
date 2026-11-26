@@ -27,7 +27,7 @@ export function PharmacyCard({
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-bold text-ink">
-          <Link href={`/pharmacies/${pharmacy.id}`} className="hover:text-brand">
+          <Link href={`/pharmacies/${pharmacy.id}`} className="hit hover:text-brand">
             {pharmacy.network} №{pharmacy.number}
           </Link>
         </h3>
@@ -50,12 +50,12 @@ export function PharmacyCard({
       ) : null}
       <div className="mt-auto flex flex-wrap gap-x-4 gap-y-2 pt-4 text-sm">
         {pharmacy.phone ? (
-          <a href={telHref(pharmacy.phone)} className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">
+          <a href={telHref(pharmacy.phone)} className="hit inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">
             <Phone className="size-4" aria-hidden /> {pharmacy.phone}
           </a>
         ) : null}
         {pharmacy.location && onShowOnMap ? (
-          <button type="button" onClick={onShowOnMap} className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">
+          <button type="button" onClick={onShowOnMap} className="hit inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">
             <MapIcon className="size-4" aria-hidden /> На карте
           </button>
         ) : null}
@@ -64,7 +64,7 @@ export function PharmacyCard({
             href={routeHref(pharmacy.location, from)}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
+            className="hit inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
           >
             <Navigation className="size-4" aria-hidden /> Маршрут
           </a>
@@ -73,7 +73,7 @@ export function PharmacyCard({
             href={mapHref(pharmacy.city, pharmacy.address)}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
+            className="hit inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
           >
             <MapPin className="size-4" aria-hidden /> На карте
           </a>

@@ -3,6 +3,7 @@
 import * as React from "react";
 import type * as Leaflet from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
 import type { LatLng } from "@/lib/geo";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,8 @@ export interface MapPoint extends LatLng {
   /** Подсказка при наведении. */
   title: string;
   tone?: "default" | "best" | "nearest";
+  /** Цена: для подписи группы «от …». */
+  price?: number;
 }
 
 interface PharmacyMapProps {
@@ -28,6 +31,10 @@ interface PharmacyMapProps {
   focus?: LatLng[];
   /** Заголовок карты для скринридеров. */
   ariaLabel: string;
+  /** Явный запрос «покажи на карте»: раскрывает группу маркеров с этой аптекой. Новый объект — новый запрос. */
+  reveal?: { id: string } | null;
+  /** Подпись группы близко стоящих маркеров. По умолчанию — их количество. */
+  clusterLabel?: (points: MapPoint[]) => string;
 }
 
 const TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL || "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -41,16 +48,33 @@ const escapeHtml = (s: string) =>
  * Карта аптек на Leaflet + OpenStreetMap. Leaflet работает только в браузере,
  * поэтому библиотека загружается динамически после монтирования.
  */
-export function PharmacyMap({ points, user, selectedId, onSelect, pickMode, onPick, className, focus, ariaLabel }: PharmacyMapProps) {
+const TONE_ORDER: NonNullable<MapPoint["tone"]>[] = ["nearest", "best", "default"];
+
+export function PharmacyMap({
+  points,
+  user,
+  selectedId,
+  onSelect,
+  pickMode,
+  onPick,
+  className,
+  focus,
+  ariaLabel,
+  reveal,
+  clusterLabel,
+}: PharmacyMapProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<Leaflet.Map | null>(null);
   const LRef = React.useRef<typeof Leaflet | null>(null);
   const markersRef = React.useRef(new Map<string, Leaflet.Marker>());
-  const layerRef = React.useRef<Leaflet.LayerGroup | null>(null);
+  const pointOf = React.useRef(new WeakMap<Leaflet.Marker, MapPoint>());
+  const layerRef = React.useRef<Leaflet.MarkerClusterGroup | null>(null);
   const userLayerRef = React.useRef<Leaflet.LayerGroup | null>(null);
   const [ready, setReady] = React.useState(false);
   const [failed, setFailed] = React.useState(false);
 
+  const clusterLabelRef = React.useRef(clusterLabel);
+  clusterLabelRef.current = clusterLabel;
   const onSelectRef = React.useRef(onSelect);
   const onPickRef = React.useRef(onPick);
   const pickModeRef = React.useRef(pickMode);
@@ -65,6 +89,15 @@ export function PharmacyMap({ points, user, selectedId, onSelect, pickMode, onPi
       .then((mod) => {
         if (cancelled || !containerRef.current) return;
         const L = (mod as unknown as { default?: typeof Leaflet }).default ?? (mod as unknown as typeof Leaflet);
+        // плагин группировки расширяет глобальный L
+        (window as unknown as { L: typeof Leaflet }).L = L;
+        return import("leaflet.markercluster").then(() => L);
+      })
+      .then((L) => {
+        if (cancelled || !L || !containerRef.current) return;
+        // Маркеры не попадают в порядок Tab: у каждой строки списка есть кнопка «На карте»,
+        // а 90 остановок на карте отрезали бы список от клавиатуры. Распространяется и на группы.
+        L.Marker.mergeOptions({ keyboard: false });
         LRef.current = L;
         const map = L.map(containerRef.current, { zoomControl: false, attributionControl: true, scrollWheelZoom: false });
         L.control.zoom({ position: "topright", zoomInTitle: "Приблизить", zoomOutTitle: "Отдалить" }).addTo(map);
@@ -77,7 +110,23 @@ export function PharmacyMap({ points, user, selectedId, onSelect, pickMode, onPi
         // колесо мыши включаем только после клика по карте, чтобы не мешать прокрутке страницы
         map.on("focus click", () => map.scrollWheelZoom.enable());
         map.on("blur mouseout", () => map.scrollWheelZoom.disable());
-        layerRef.current = L.layerGroup().addTo(map);
+        layerRef.current = L.markerClusterGroup({
+          maxClusterRadius: 64,
+          disableClusteringAtZoom: 16,
+          showCoverageOnHover: false,
+          spiderfyOnMaxZoom: true,
+          iconCreateFunction: (cluster) => {
+            const children = cluster.getAllChildMarkers().map((m) => pointOf.current.get(m)).filter((p): p is MapPoint => !!p);
+            const tone = TONE_ORDER.find((t) => children.some((c) => (c.tone ?? "default") === t)) ?? "default";
+            const label = clusterLabelRef.current?.(children) ?? String(children.length);
+            return L.divIcon({
+              className: "",
+              html: `<span class="map-pin map-pin--cluster map-pin--${tone}" title="${children.length} — приблизить">${escapeHtml(label)}<span class="map-pin__count">${children.length}</span></span>`,
+              iconSize: undefined,
+              iconAnchor: [0, 0],
+            });
+          },
+        }).addTo(map);
         userLayerRef.current = L.layerGroup().addTo(map);
         mapRef.current = map;
         setReady(true);
@@ -90,25 +139,41 @@ export function PharmacyMap({ points, user, selectedId, onSelect, pickMode, onPi
     };
   }, []);
 
-  // Маркеры аптек
+  // Маркеры аптек. Выделение зашито в иконку: маркер внутри группы не имеет DOM-элемента,
+  // и класс, добавленный напрямую, потерялся бы при раскрытии группы.
+  const iconFor = (L: typeof Leaflet, p: MapPoint, selected: boolean) =>
+    L.divIcon({
+      className: "",
+      html: `<span class="map-pin map-pin--${p.tone ?? "default"}${selected ? " map-pin--selected" : ""}" title="${escapeHtml(p.title)}">${escapeHtml(p.label)}</span>`,
+      iconSize: undefined,
+      iconAnchor: [0, 0],
+    });
+  const selectedIdRef = React.useRef(selectedId);
+  selectedIdRef.current = selectedId;
+  const shownSelectedRef = React.useRef<string | null>(null);
+
   React.useEffect(() => {
     const L = LRef.current;
     const layer = layerRef.current;
     if (!ready || !L || !layer) return;
     layer.clearLayers();
     markersRef.current.clear();
+    const selected = selectedIdRef.current ?? null;
     for (const p of points) {
-      const icon = L.divIcon({
-        className: "",
-        html: `<span class="map-pin map-pin--${p.tone ?? "default"}" title="${escapeHtml(p.title)}">${escapeHtml(p.label)}</span>`,
-        iconSize: undefined,
-        iconAnchor: [0, 0],
-      });
-      const marker = L.marker([p.lat, p.lng], { icon, keyboard: true, title: p.title, riseOnHover: true })
-        .on("click", () => onSelectRef.current?.(p.id))
-        .addTo(layer);
+      const isSelected = p.id === selected;
+      const marker = L.marker([p.lat, p.lng], {
+        icon: iconFor(L, p, isSelected),
+        keyboard: false,
+        title: p.title,
+        riseOnHover: true,
+        zIndexOffset: isSelected ? 900 : 0,
+      }).on("click", () => onSelectRef.current?.(p.id));
+      pointOf.current.set(marker, p);
       markersRef.current.set(p.id, marker);
     }
+    shownSelectedRef.current = selected;
+    layer.addLayers([...markersRef.current.values()]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points, ready]);
 
   // Подгоняем масштаб под точки фокуса, когда меняется набор
@@ -138,20 +203,37 @@ export function PharmacyMap({ points, user, selectedId, onSelect, pickMode, onPi
     }).addTo(layer);
   }, [user, ready]);
 
-  // Выделение выбранной аптеки
+  // Выделение выбранной аптеки: перерисовываем только прежний и новый маркер
   React.useEffect(() => {
+    const L = LRef.current;
     const map = mapRef.current;
-    if (!ready || !map) return;
-    markersRef.current.forEach((marker, id) => {
-      const el = marker.getElement()?.querySelector(".map-pin");
-      el?.classList.toggle("map-pin--selected", id === selectedId);
-      marker.setZIndexOffset(id === selectedId ? 900 : 0);
-    });
-    const selected = selectedId ? markersRef.current.get(selectedId) : null;
+    if (!ready || !L || !map) return;
+    const next = selectedId ?? null;
+    const prev = shownSelectedRef.current;
+    if (prev !== next) {
+      for (const [id, on] of [[prev, false], [next, true]] as const) {
+        const marker = id ? markersRef.current.get(id) : null;
+        const point = marker ? pointOf.current.get(marker) : null;
+        if (!marker || !point) continue;
+        marker.setIcon(iconFor(L, point, on));
+        marker.setZIndexOffset(on ? 900 : 0);
+      }
+      shownSelectedRef.current = next;
+    }
+    const selected = next ? markersRef.current.get(next) : null;
     if (selected && !map.getBounds().pad(-0.1).contains(selected.getLatLng())) {
       map.panTo(selected.getLatLng(), { animate: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId, ready, points]);
+
+  // «На карте»: раскрываем группу, в которой спрятана аптека
+  React.useEffect(() => {
+    const layer = layerRef.current;
+    const marker = reveal ? markersRef.current.get(reveal.id) : null;
+    if (!ready || !layer || !marker) return;
+    layer.zoomToShowLayer(marker);
+  }, [reveal, ready]);
 
   return (
     <div

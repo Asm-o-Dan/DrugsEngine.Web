@@ -18,10 +18,10 @@ export function SiteFooter({ demo }: { demo: boolean }) {
             {demo ? " Сейчас показаны демонстрационные данные." : ""}
           </p>
         </div>
-        <nav aria-label="Ссылки в подвале" className="flex gap-x-6 gap-y-2 md:flex-col md:items-end">
-          <Link className="hover:text-ink" href="/search">Каталог</Link>
-          <Link className="hover:text-ink" href="/pharmacies">Аптеки</Link>
-          <Link className="hover:text-ink" href="/status">Состояние сервиса</Link>
+        <nav aria-label="Ссылки в подвале" className="flex flex-wrap gap-x-6 gap-y-4 md:flex-col md:items-end">
+          <Link className="hit hover:text-ink" href="/search">Каталог</Link>
+          <Link className="hit hover:text-ink" href="/pharmacies">Аптеки</Link>
+          <Link className="hit hover:text-ink" href="/status">Состояние сервиса</Link>
         </nav>
       </div>
     </footer>

@@ -29,7 +29,7 @@ export function AnalogList({ analogs, basePrice, baseIngredient }: { analogs: An
           <li key={a.id}>
             <Link href={`/drugs/${a.id}`} className="group flex items-center gap-4 px-4 py-3.5 sm:px-5">
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold text-ink group-hover:text-brand">{a.name}</p>
+                <p className="line-clamp-2 font-semibold text-ink group-hover:text-brand">{a.name}</p>
                 <p className="mt-0.5 truncate text-sm text-ink-2">
                   {sameIngredient ? (
                     <>

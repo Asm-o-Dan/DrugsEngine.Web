@@ -30,14 +30,14 @@ export function LocateControl({
           <LocateFixed className="size-4 text-[#2563eb]" aria-hidden />
           {position.source === "gps" ? "Расстояние от вас" : "Расстояние от выбранной точки"}
         </span>
-        <button type="button" onClick={() => onPickModeChange(true)} className="font-semibold text-brand hover:underline">
+        <button type="button" onClick={() => onPickModeChange(true)} className="hit font-semibold text-brand hover:underline">
           Изменить
         </button>
         <button
           type="button"
           onClick={clear}
           aria-label="Сбросить местоположение"
-          className="grid size-7 place-items-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink"
+          className="hit grid size-7 place-items-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink"
         >
           <X className="size-4" />
         </button>
@@ -51,7 +51,7 @@ export function LocateControl({
         <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
           <MapPinned className="size-4 text-brand" aria-hidden /> Укажите точку на карте
         </span>
-        <button type="button" onClick={() => onPickModeChange(false)} className="font-semibold text-ink-2 hover:text-ink">
+        <button type="button" onClick={() => onPickModeChange(false)} className="hit font-semibold text-ink-2 hover:text-ink">
           Отмена
         </button>
       </div>
@@ -73,13 +73,13 @@ export function LocateControl({
         type="button"
         onClick={locate}
         disabled={status === "locating"}
-        className="inline-flex h-9 items-center gap-2 rounded-control bg-brand px-3.5 font-semibold text-brand-ink transition-colors hover:bg-brand-hover disabled:opacity-70"
+        className="inline-flex h-11 items-center gap-2 rounded-control bg-brand sm:h-9 px-3.5 font-semibold text-brand-ink transition-colors hover:bg-brand-hover disabled:opacity-70"
       >
         {status === "locating" ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Crosshair className="size-4" aria-hidden />}
         {status === "locating" ? "Определяем…" : "Рядом со мной"}
       </button>
       {hint ? <span className="text-ink-2">{hint}</span> : null}
-      <button type="button" onClick={() => onPickModeChange(true)} className="font-semibold text-brand hover:underline">
+      <button type="button" onClick={() => onPickModeChange(true)} className="hit font-semibold text-brand hover:underline">
         Указать на карте
       </button>
     </div>

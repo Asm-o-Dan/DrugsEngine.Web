@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Map as MapIcon, MapPin, Navigation, Phone } from "lucide-react";
+import { ChevronDown, Map as MapIcon, MapPin, Navigation, Phone } from "lucide-react";
 import type { Offer } from "@/lib/contracts";
-import { formatPrice, formatPriceShort, formatUpdatedAt, mapHref, telHref } from "@/lib/format";
+import { countLabel, formatPrice, formatPriceShort, formatUpdatedAt, mapHref, telHref } from "@/lib/format";
 import { distanceKm, mapFocus, formatDistance, routeHref } from "@/lib/geo";
 import { Badge } from "@/components/ui/badge";
 import { PharmacyMap, type MapPoint } from "@/components/map/PharmacyMap";
@@ -14,6 +14,8 @@ import { useUserLocation } from "@/components/map/useUserLocation";
 import { cn } from "@/lib/utils";
 
 const ALL = "__all__";
+/** Сколько аптек показываем сразу: список уже отсортирован, дальше — по кнопке. */
+const INITIAL_ROWS = 10;
 type Sort = "price" | "distance";
 
 interface Row extends Offer {
@@ -32,6 +34,9 @@ export function OffersList({ offers }: { offers: Offer[] }) {
   const [network, setNetwork] = React.useState<string>(ALL);
   const [sort, setSort] = React.useState<Sort>("price");
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [reveal, setReveal] = React.useState<{ id: string } | null>(null);
+  const [expanded, setExpanded] = React.useState(false);
+  const pendingScrollRef = React.useRef<string | null>(null);
   const rowRefs = React.useRef(new Map<string, HTMLLIElement>());
   const mapBoxRef = React.useRef<HTMLDivElement>(null);
 
@@ -84,6 +89,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
           label: formatPriceShort(r.price),
           title: `${r.pharmacy.network} №${r.pharmacy.number}, ${r.pharmacy.address} — ${formatPrice(r.price)}`,
           tone: nearest?.pharmacy.id === r.pharmacy.id ? "nearest" : isCheapest(r) ? "best" : "default",
+          price: r.price,
         })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [rows, nearest?.pharmacy.id, cheapest?.price, hasSpread],
@@ -98,12 +104,29 @@ export function OffersList({ offers }: { offers: Offer[] }) {
     [rows, user],
   );
 
+  const visibleRows = expanded ? rows : rows.slice(0, INITIAL_ROWS);
+  const hiddenCount = rows.length - visibleRows.length;
+
+  const scrollToRow = (id: string) => rowRefs.current.get(id)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   const selectFromMap = (id: string) => {
     setSelectedId(id);
-    rowRefs.current.get(id)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (rowRefs.current.has(id)) scrollToRow(id);
+    else {
+      // строка скрыта за «Показать все» — раскрываем список и прокручиваем после отрисовки
+      pendingScrollRef.current = id;
+      setExpanded(true);
+    }
   };
+  React.useEffect(() => {
+    const id = pendingScrollRef.current;
+    if (expanded && id) {
+      pendingScrollRef.current = null;
+      scrollToRow(id);
+    }
+  }, [expanded]);
   const showOnMap = (id: string) => {
     setSelectedId(id);
+    setReveal({ id });
     mapBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
@@ -136,6 +159,8 @@ export function OffersList({ offers }: { offers: Offer[] }) {
             user={user}
             selectedId={selectedId}
             onSelect={selectFromMap}
+            reveal={reveal}
+            clusterLabel={(group) => `от ${formatPriceShort(Math.min(...group.map((g) => g.price ?? Infinity)))}`}
             pickMode={pickMode}
             onPick={(p) => {
               location.setManual(p);
@@ -156,7 +181,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
       ) : null}
 
       {networks.length > 1 ? (
-        <div role="group" aria-label="Сеть аптек" className="flex flex-wrap gap-1.5 pt-1">
+        <div role="group" aria-label="Сеть аптек" className={CHIP_ROW}>
           {[ALL, ...networks].map((n) => {
             const count = n === ALL ? offers.length : offers.filter((o) => o.pharmacy.network === n).length;
             return (
@@ -166,7 +191,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                 aria-pressed={network === n}
                 onClick={() => setNetwork(n)}
                 className={cn(
-                  "rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
+                  CHIP,
                   network === n
                     ? "border-brand bg-brand text-brand-ink"
                     : "border-line bg-surface text-ink-2 hover:border-line-strong hover:text-ink",
@@ -180,9 +205,9 @@ export function OffersList({ offers }: { offers: Offer[] }) {
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         {cities.length > 1 ? (
-          <div role="group" aria-label="Город" className="flex flex-wrap gap-1.5">
+          <div role="group" aria-label="Город" className={cn(CHIP_ROW, "w-full")}>
             {[ALL, ...cities].map((c) => {
               const count = c === ALL ? offers.length : offers.filter((o) => o.pharmacy.city === c).length;
               return (
@@ -192,7 +217,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                   aria-pressed={city === c}
                   onClick={() => setCity(c)}
                   className={cn(
-                    "rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
+                    CHIP,
                     city === c
                       ? "border-ink bg-ink text-bg"
                       : "border-line bg-surface text-ink-2 hover:border-line-strong hover:text-ink",
@@ -222,7 +247,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                 aria-checked={sort === value}
                 onClick={() => setSort(value)}
                 className={cn(
-                  "rounded-[8px] px-3 py-1 text-sm font-semibold transition-colors",
+                  "hit rounded-[8px] px-3 py-1 text-sm font-semibold transition-colors",
                   sort === value ? "bg-ink text-bg" : "text-ink-2 hover:text-ink",
                 )}
               >
@@ -234,7 +259,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
       </div>
 
       <ol className="divide-y divide-dashed divide-line rounded-card border border-line bg-surface shadow-card">
-        {rows.map((offer) => {
+        {visibleRows.map((offer) => {
           const p = offer.pharmacy;
           const isBest = isCheapest(offer);
           const isNearest = offer.pharmacy.id === nearest?.pharmacy.id;
@@ -253,7 +278,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
               )}
             >
               <div className="flex items-baseline gap-3">
-                <Link href={`/pharmacies/${p.id}`} className="min-w-0 shrink font-bold text-ink hover:text-brand">
+                <Link href={`/pharmacies/${p.id}`} className="hit min-w-0 shrink font-bold text-ink hover:text-brand">
                   {p.network} №{p.number}
                 </Link>
                 <span className="leader" aria-hidden />
@@ -284,8 +309,9 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                 {p.hours ? <span className="text-ink-3">{p.hours}</span> : null}
               </div>
               <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-3 sm:gap-x-4">
                 {p.phone ? (
-                  <a href={telHref(p.phone)} className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">
+                  <a href={telHref(p.phone)} className="hit inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-brand hover:underline">
                     <Phone className="size-4" aria-hidden /> {p.phone}
                   </a>
                 ) : null}
@@ -294,7 +320,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                     <button
                       type="button"
                       onClick={() => showOnMap(p.id)}
-                      className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
+                      className="hit inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-brand hover:underline"
                     >
                       <MapIcon className="size-4" aria-hidden /> На карте
                     </button>
@@ -302,7 +328,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                       href={routeHref(p.location, user)}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
+                      className="hit inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-brand hover:underline"
                     >
                       <Navigation className="size-4" aria-hidden /> Маршрут
                     </a>
@@ -312,17 +338,33 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                     href={mapHref(p.city, p.address)}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline"
+                    className="hit inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-brand hover:underline"
                   >
                     <MapPin className="size-4" aria-hidden /> На карте
                   </a>
                 )}
-                <span className="ml-auto text-xs text-ink-3">Цена обновлена {formatUpdatedAt(offer.updatedAt)}</span>
+                </div>
+                <span className="w-full text-xs text-ink-3 sm:ml-auto sm:w-auto">Цена обновлена {formatUpdatedAt(offer.updatedAt)}</span>
               </div>
             </li>
           );
         })}
       </ol>
+      {hiddenCount > 0 ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex h-11 w-full items-center justify-center gap-1.5 rounded-control border border-line-strong bg-surface text-sm font-semibold text-ink transition-colors hover:border-ink"
+        >
+          Показать ещё {countLabel(hiddenCount, "аптеку", "аптеки", "аптек")}
+          <ChevronDown className="size-4" aria-hidden />
+        </button>
+      ) : null}
     </div>
   );
 }
+
+/** Ряд фильтров: на телефоне — одна прокручиваемая строка, шире — с переносом. */
+const CHIP_ROW =
+  "-mx-4 flex gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:py-0 [&::-webkit-scrollbar]:hidden";
+const CHIP = "hit shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-sm font-semibold transition-colors";

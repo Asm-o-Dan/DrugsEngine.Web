@@ -15,6 +15,7 @@ export function PharmaciesExplorer({ items }: { items: PharmacyListItem[] }) {
   const user = location.position;
   const [pickMode, setPickMode] = React.useState(false);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [reveal, setReveal] = React.useState<{ id: string } | null>(null);
   const mapBoxRef = React.useRef<HTMLDivElement>(null);
   const cardRefs = React.useRef(new Map<string, HTMLLIElement>());
 
@@ -56,6 +57,7 @@ export function PharmaciesExplorer({ items }: { items: PharmacyListItem[] }) {
   };
   const showOnMap = (id: string) => {
     setSelectedId(id);
+    setReveal({ id });
     mapBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
@@ -116,6 +118,7 @@ export function PharmaciesExplorer({ items }: { items: PharmacyListItem[] }) {
               user={user}
               selectedId={selectedId}
               onSelect={select}
+              reveal={reveal}
               pickMode={pickMode}
               onPick={(p) => {
                 location.setManual(p);
