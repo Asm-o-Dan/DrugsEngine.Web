@@ -2,67 +2,166 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Цвета задаются как "R G B", чтобы работали модификаторы прозрачности Tailwind (bg-brand/10). */
 @layer base {
   :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
-    --card: #ffffff;
-    --card-foreground: #0f172a;
-    --popover: #ffffff;
-    --popover-foreground: #0f172a;
-    --primary: #059669;
-    --primary-foreground: #ffffff;
-    --primary-hover: #047857;
-    --primary-glow: #d1fae5;
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #059669;
-    --radius: 0.5rem;
-    --vector: #0284c7;
-    --vector-glow: #e0f2fe;
+    --bg: 246 245 241;
+    --surface: 255 255 255;
+    --surface-2: 239 237 231;
+    --ink: 23 24 26;
+    --ink-2: 84 87 93;
+    --ink-3: 99 102 108;
+    --line: 226 223 215;
+    --line-strong: 204 200 190;
+    --brand: 11 110 79;
+    --brand-hover: 8 92 66;
+    --brand-ink: 255 255 255;
+    --brand-soft: 224 240 232;
+    --deal: 252 236 186;
+    --deal-ink: 112 70 0;
+    --warn: 181 71 8;
+    --warn-soft: 254 240 220;
+    --danger: 180 35 24;
+    --danger-soft: 254 228 226;
+    --shadow: 40 36 28;
+    color-scheme: light;
   }
 
   .dark {
-    --background: #020617;
-    --foreground: #f8fafc;
-    --card: #0f172a;
-    --card-foreground: #f8fafc;
-    --popover: #0f172a;
-    --popover-foreground: #f8fafc;
-    --primary: #10b981;
-    --primary-foreground: #020617;
-    --primary-hover: #059669;
-    --primary-glow: rgba(16, 185, 129, 0.15);
-    --secondary: #1e293b;
-    --secondary-foreground: #f8fafc;
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    --accent: #1e293b;
-    --accent-foreground: #f8fafc;
-    --destructive: #f87171;
-    --destructive-foreground: #020617;
-    --border: #334155;
-    --input: #334155;
-    --ring: #10b981;
-    --vector: #38bdf8;
-    --vector-glow: rgba(56, 189, 248, 0.15);
+    --bg: 17 18 20;
+    --surface: 26 27 30;
+    --surface-2: 34 35 39;
+    --ink: 240 239 236;
+    --ink-2: 168 170 176;
+    --ink-3: 142 145 152;
+    --line: 46 48 53;
+    --line-strong: 64 67 73;
+    --brand: 74 196 146;
+    --brand-hover: 98 212 164;
+    --brand-ink: 10 26 19;
+    --brand-soft: 25 52 41;
+    --deal: 70 56 18;
+    --deal-ink: 247 214 125;
+    --warn: 245 158 90;
+    --warn-soft: 60 38 20;
+    --danger: 248 113 104;
+    --danger-soft: 66 26 24;
+    --shadow: 0 0 0;
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg text-ink antialiased;
+    font-feature-settings: "tnum" 0;
+  }
+
+  ::selection {
+    @apply bg-brand/20;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-bg;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .num {
+    font-variant-numeric: tabular-nums;
   }
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+
+  /* Пунктирная «чековая» направляющая между названием и ценой. */
+  /* Зона нажатия не меньше 44×44 без изменения внешнего вида (WCAG 2.5.5). */
+  .hit {
+    @apply relative;
+  }
+  .hit::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
+  .leader {
+    @apply flex-1 self-end mb-[0.4em] min-w-4 border-b border-dotted border-line-strong;
   }
 }
+
+/* ---------- Карта ---------- */
+/* Вне @layer: классы маркеров собираются динамически, Tailwind не должен их вырезать. */
+  .leaflet-container {
+    font: inherit;
+    background: rgb(var(--surface-2));
+  }
+  .map-picking .leaflet-container {
+    cursor: crosshair;
+  }
+  .dark .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
+  }
+  .leaflet-control-zoom.leaflet-bar {
+    @apply overflow-hidden rounded-control border border-line shadow-card;
+  }
+  .leaflet-control-zoom a {
+    @apply bg-surface text-ink;
+    border-color: rgb(var(--line)) !important;
+  }
+  /* специфичнее, чем у Leaflet: его стили грузятся позже и иначе белый фон перебивает наш в тёмной теме */
+  .leaflet-container .leaflet-control.leaflet-control-attribution {
+    @apply bg-surface/90 text-[10px] text-ink-2;
+  }
+  .leaflet-container .leaflet-control-attribution a {
+    @apply text-ink-2;
+  }
+
+  /* Маркер-ценник: якорь — нижний центр «хвостика». */
+  .map-pin {
+    @apply num absolute whitespace-nowrap rounded-full border-2 border-surface bg-ink px-2 py-0.5 text-xs font-extrabold text-bg shadow-pop;
+    transform: translate(-50%, calc(-100% - 6px));
+    transition: transform 120ms ease;
+    cursor: pointer;
+  }
+  .map-pin::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 8px;
+    height: 8px;
+    background: inherit;
+    border-right: 2px solid rgb(var(--surface));
+    border-bottom: 2px solid rgb(var(--surface));
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .map-pin--best {
+    @apply bg-deal text-deal-ink;
+  }
+  .map-pin--nearest {
+    @apply bg-brand text-brand-ink;
+  }
+  .map-pin--selected {
+    @apply ring-4 ring-brand/40;
+    transform: translate(-50%, calc(-100% - 6px)) scale(1.12);
+  }
+  /* Группа близко стоящих аптек: ценник «от …» и счётчик */
+  .map-pin--cluster {
+    @apply pr-1;
+  }
+  .map-pin__count {
+    @apply ml-1.5 inline-grid min-w-[18px] place-items-center rounded-full bg-surface px-1 text-[10px] font-extrabold leading-[16px] text-ink;
+  }
+  .map-user {
+    @apply absolute block size-4 rounded-full border-[3px] border-surface bg-[#2563eb];
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 6px rgb(37 99 235 / 0.25);
+  }
