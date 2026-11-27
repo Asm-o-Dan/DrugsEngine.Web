@@ -129,13 +129,19 @@ export function PharmaciesExplorer({ items }: { items: PharmacyListItem[] }) {
           </div>
           {user && nearest?.distanceKm != null && nearest.pharmacy.location ? (
             <NearestSummary
-              nearest={{
-                id: nearest.pharmacy.id,
-                title: `${nearest.pharmacy.network} №${nearest.pharmacy.number}`,
-                address: `${nearest.pharmacy.city}, ${nearest.pharmacy.address}`,
-                location: nearest.pharmacy.location,
-                distanceKm: nearest.distanceKm,
-              }}
+              cards={[
+                {
+                  kind: "primary",
+                  label: "Ближайшая к вам",
+                  item: {
+                    id: nearest.pharmacy.id,
+                    title: `${nearest.pharmacy.network} №${nearest.pharmacy.number}`,
+                    address: `${nearest.pharmacy.city}, ${nearest.pharmacy.address}`,
+                    location: nearest.pharmacy.location,
+                    distanceKm: nearest.distanceKm,
+                  },
+                },
+              ]}
               from={user}
               onSelect={showOnMap}
             />

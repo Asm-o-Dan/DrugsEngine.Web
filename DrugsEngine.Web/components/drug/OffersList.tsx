@@ -9,14 +9,21 @@ import { distanceKm, mapFocus, formatDistance, routeHref } from "@/lib/geo";
 import { Badge } from "@/components/ui/badge";
 import { PharmacyMap, type MapPoint } from "@/components/map/PharmacyMap";
 import { LocateControl } from "@/components/map/LocateControl";
-import { NearestSummary } from "@/components/map/NearestSummary";
+import { NearestSummary, type SummaryCard } from "@/components/map/NearestSummary";
+import { rankOptimal, NOTICEABLE_PCT, NOTICEABLE_RUB } from "@/lib/ranking";
 import { useUserLocation } from "@/components/map/useUserLocation";
 import { cn } from "@/lib/utils";
 
 const ALL = "__all__";
 /** Сколько аптек показываем сразу: список уже отсортирован, дальше — по кнопке. */
 const INITIAL_ROWS = 10;
-type Sort = "price" | "distance";
+type Sort = "best" | "distance" | "price";
+
+const SORTS: { value: Sort; label: string }[] = [
+  { value: "best", label: "Оптимально" },
+  { value: "distance", label: "Ближе" },
+  { value: "price", label: "Дешевле" },
+];
 
 interface Row extends Offer {
   distanceKm: number | null;
@@ -40,10 +47,10 @@ export function OffersList({ offers }: { offers: Offer[] }) {
   const rowRefs = React.useRef(new Map<string, HTMLLIElement>());
   const mapBoxRef = React.useRef<HTMLDivElement>(null);
 
-  // Когда пользователь указал местоположение — по умолчанию сортируем по расстоянию.
+  // Когда пользователь указал местоположение — по умолчанию «Оптимально»: ближе, но без заметной переплаты.
   const userKey = user ? `${user.lat},${user.lng}` : null;
   React.useEffect(() => {
-    if (userKey) setSort("distance");
+    if (userKey) setSort("best");
   }, [userKey]);
 
   const cities = React.useMemo(
@@ -62,11 +69,9 @@ export function OffersList({ offers }: { offers: Offer[] }) {
         ...o,
         distanceKm: user && o.pharmacy.location ? distanceKm(user, o.pharmacy.location) : null,
       }));
-    return withDistance.sort((a, b) =>
-      sort === "distance" && user
-        ? (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity) || a.price - b.price
-        : a.price - b.price,
-    );
+    if (!user || sort === "price") return withDistance.sort((a, b) => a.price - b.price);
+    if (sort === "best") return rankOptimal(withDistance);
+    return withDistance.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity) || a.price - b.price);
   }, [offers, city, network, sort, user]);
 
   const cheapest = rows.reduce<Row | null>((best, r) => (!best || r.price < best.price ? r : best), null);
@@ -130,6 +135,9 @@ export function OffersList({ offers }: { offers: Offer[] }) {
     mapBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
+  // Рекомендация: «оптимальная» аптека среди тех, до которых известно расстояние
+  const best = user ? rankOptimal(rows.filter((r) => r.distanceKm != null))[0] ?? null : null;
+
   const hasMap = points.length > 0;
   const toSummary = (r: Row) => ({
     id: r.pharmacy.id,
@@ -171,13 +179,8 @@ export function OffersList({ offers }: { offers: Offer[] }) {
         </div>
       ) : null}
 
-      {user && nearest?.distanceKm != null ? (
-        <NearestSummary
-          nearest={toSummary(nearest)}
-          cheapest={cheapest && cheapest.distanceKm != null ? toSummary(cheapest) : null}
-          from={user}
-          onSelect={showOnMap}
-        />
+      {user && nearest?.distanceKm != null && best ? (
+        <NearestSummary cards={summaryCards(nearest, best, cheapest).map((c) => ({ ...c, item: toSummary(c.row) }))} from={user} onSelect={showOnMap} />
       ) : null}
 
       {networks.length > 1 ? (
@@ -198,7 +201,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                 )}
               >
                 {n === ALL ? "Все сети" : n}
-                <span className={cn("num ml-1.5", network === n ? "text-brand-ink/70" : "text-ink-3")}>{count}</span>
+                <span className={cn("num ml-1.5", network === n ? "text-brand-ink/90" : "text-ink-3")}>{count}</span>
               </button>
             );
           })}
@@ -224,7 +227,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
                   )}
                 >
                   {c === ALL ? "Все города" : c}
-                  <span className={cn("num ml-1.5", city === c ? "text-bg/70" : "text-ink-3")}>{count}</span>
+                  <span className={cn("num ml-1.5", city === c ? "text-bg/80" : "text-ink-3")}>{count}</span>
                 </button>
               );
             })}
@@ -234,12 +237,7 @@ export function OffersList({ offers }: { offers: Offer[] }) {
         )}
         {user ? (
           <div role="radiogroup" aria-label="Сортировка" className="inline-flex rounded-control border border-line bg-surface p-0.5">
-            {(
-              [
-                ["price", "Дешевле"],
-                ["distance", "Ближе"],
-              ] as const
-            ).map(([value, label]) => (
+            {SORTS.map(({ value, label }) => (
               <button
                 key={value}
                 type="button"
@@ -257,6 +255,12 @@ export function OffersList({ offers }: { offers: Offer[] }) {
           </div>
         ) : null}
       </div>
+      {user && sort === "best" ? (
+        <p className="-mt-1 text-xs text-ink-2">
+          Сначала ближайшие аптеки. Дальняя поднимается выше, только если она дешевле больше чем на{" "}
+          {Math.round(NOTICEABLE_PCT * 100)}% или на {NOTICEABLE_RUB} руб.
+        </p>
+      ) : null}
 
       <ol className="divide-y divide-dashed divide-line rounded-card border border-line bg-surface shadow-card">
         {visibleRows.map((offer) => {
@@ -368,3 +372,36 @@ export function OffersList({ offers }: { offers: Offer[] }) {
 const CHIP_ROW =
   "-mx-4 flex gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:py-0 [&::-webkit-scrollbar]:hidden";
 const CHIP = "hit shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-sm font-semibold transition-colors";
+
+/**
+ * Карточки над списком. Если ближайшая аптека не заметно дороже самой выгодной — одна общая карточка,
+ * иначе две: «Выгоднее» (дешевле заметно, но дальше) и «Ближайшая».
+ */
+function summaryCards(nearest: Row, best: Row, cheapest: Row | null): (Omit<SummaryCard, "item"> & { row: Row })[] {
+  if (best.pharmacy.id === nearest.pharmacy.id) {
+    const extra = cheapest ? nearest.price - cheapest.price : 0;
+    return [
+      {
+        kind: "primary",
+        label: "Ближе всех и по хорошей цене",
+        note:
+          extra > 0.005
+            ? `Дороже самой низкой цены всего на ${formatPrice(extra)}`
+            : "Здесь же самая низкая цена",
+        row: nearest,
+      },
+    ];
+  }
+  const saving = nearest.price - best.price;
+  const pct = Math.round((saving / nearest.price) * 100);
+  const detour = best.distanceKm! - nearest.distanceKm!;
+  return [
+    {
+      kind: "primary",
+      label: "Выгоднее",
+      note: `Дешевле ближайшей на ${formatPrice(saving)} (${pct}%), дальше на ${formatDistance(detour)}`,
+      row: best,
+    },
+    { kind: "secondary", label: "Ближайшая к вам", row: nearest },
+  ];
+}

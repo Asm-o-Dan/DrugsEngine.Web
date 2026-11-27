@@ -116,8 +116,9 @@
     @apply bg-surface text-ink;
     border-color: rgb(var(--line)) !important;
   }
-  .leaflet-control-attribution {
-    @apply bg-surface/80 text-[10px] text-ink-3;
+  /* специфичнее, чем у Leaflet: его стили грузятся позже и иначе белый фон перебивает наш в тёмной теме */
+  .leaflet-container .leaflet-control.leaflet-control-attribution {
+    @apply bg-surface/90 text-[10px] text-ink-2;
   }
   .leaflet-container .leaflet-control-attribution a {
     @apply text-ink-2;
